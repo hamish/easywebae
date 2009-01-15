@@ -1,10 +1,21 @@
 <html>
+<head>
+<title>easywebAE admin</title>
+</head>
 <body>
-<form action="">
-URL: <input type="text" />
-HTML: <textarea rows=20 cols=40></textarea>
+<form action="" onSubmit="alert('Error - do not submit'); return false">
+{% for page in pages %}
+	URL: <input type="text" name="url" value="{{page.url}}" />
+	HTML: <textarea name="html" rows=10 cols=40>{{page.html}}</textarea>
+	<br />
+{% endfor %}
+ </form>
+ 
+<form action="/admin/save" name="newRecord">
+URL: <input type="text" name="url" />
+HTML: <textarea name="html" rows=10 cols=40></textarea>
 <br />
-<input type="submit" value="Save" />
+<input type="submit" value="Save" name="Save"/>
 </form>
 </body>
 </html>
