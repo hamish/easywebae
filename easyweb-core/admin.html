@@ -4,7 +4,7 @@
 </head>
 <body>
 {% for page in pages %}
-<form action="/admin/edit" method="POST" name="key_{{page.key}}">
+<form action="/admin/edit" method="POST" name="url_{{page.url}}">
 	URL: <input type="text" name="url" value="{{page.url}}" />
 	HTML: <textarea name="html" rows=10 cols=40>{{page.html}}</textarea>
 	<br />

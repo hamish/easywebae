@@ -17,7 +17,6 @@ class NewTest(unittest.TestCase):
         sel.type(html_field, test_html_content)
         sel.click(save_button)
         sel.wait_for_page_to_load("30000")
-        return test_html_content
     
     def assertNewRecordForm(self, sel):        
         #verify that the for to enter a new record is there.
@@ -37,25 +36,49 @@ class NewTest(unittest.TestCase):
         current_time = "%f" % time()
 
         sel.open("/admin")
-        test_html_content = "<html>\n<head>\n<title>SAMPLE</title>\n</head>\n<body>\nMY Test[" + current_time + "]\n</body>\n</html>"
+        test_html_content = "<html>\n<head>\n<title>Update Test</title>\n</head>\n<body>\nMY Test[" + current_time + "]\n</body>\n</html>"
         self.create_new_record(sel, current_time, test_html_content)
         
+        update_form = "//form[@name='url_/test_" + current_time + "']"
+        update_url_field = update_form + "/input[@name='url']"
+        update_html_field = update_form + "/textarea[@name='html']"
+        update_save_button = update_form + "/input[@name='Save']"  
         
+        self.failUnless(sel.is_element_present(update_form))
+
+        sel.type(update_url_field, "/test_" + current_time + "_updated")
+        sel.type(update_html_field, "<html>\n<head>\n<title>Update Test - Updated</title>\n</head>\n<body>\nMY Test[" + current_time + "] updated\n</body>\n</html>")
+        sel.click(update_save_button)
+        sel.wait_for_page_to_load("30000")    
     
+        # go to the old URL - should give the standard error message
+        sel.open("/test_" + current_time)
+        sel.wait_for_page_to_load("30000")
+        self.assertEqual(sel.get_body_text(), "nothing here")
+
+        # go to the new URL - should give the new content.
+        sel.open("/test_" + current_time + "_updated")
+        sel.wait_for_page_to_load("30000")
+        
+        #validate the values present.
+        self.assertEqual(sel.get_title(), "Update Test - Updated")
+        self.assertEqual(sel.get_body_text(), "MY Test["+ current_time +"] updated")
+        self.failUnless(sel.is_text_present("MY Test["+ current_time +"] updated"))
+        
     def test_simple_insert(self):
         sel = self.selenium
         current_time = "%f" % time()
         sel.open("/admin")
         
         self.assertNewRecordForm(sel)
-        test_html_content = "<html>\n<head>\n<title>DEF</title>\n</head>\n<body>\nMY Test[" + current_time + "]\n</body>\n</html>"
+        test_html_content = "<html>\n<head>\n<title>Create Test</title>\n</head>\n<body>\nMY Test[" + current_time + "]\n</body>\n</html>"
         self.create_new_record(sel, current_time, test_html_content)
         
         # re-validate that the new fild form is present.
         self.assertNewRecordForm(sel)
         
         # validate that the expected form is in place
-        entered_url_field = "//input[@value='/test_%s']" %current_time
+        entered_url_field = "//input[@value='/test_%s']" % current_time
         self.failUnless(sel.is_element_present(entered_url_field))
         entered_html_field = "//textarea[@value='%s'" % test_html_content
         
@@ -64,7 +87,7 @@ class NewTest(unittest.TestCase):
         sel.wait_for_page_to_load("30000")
         
         #validate the values present.
-        self.assertEqual(sel.get_title(), "DEF")
+        self.assertEqual(sel.get_title(), "Create Test")
         self.assertEqual(sel.get_body_text(), "MY Test["+ current_time +"]")
         self.failUnless(sel.is_text_present("MY Test["+ current_time +"]"))
     
