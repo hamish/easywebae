@@ -3,15 +3,17 @@
 <title>easywebAE admin</title>
 </head>
 <body>
-<form action="" onSubmit="alert('Error - do not submit'); return false">
 {% for page in pages %}
+<form action="/admin/edit" method="POST" name="key_{{page.key}}">
 	URL: <input type="text" name="url" value="{{page.url}}" />
 	HTML: <textarea name="html" rows=10 cols=40>{{page.html}}</textarea>
 	<br />
-{% endfor %}
+	<input type="submit" name="Save" value="Save Changes" />
+	<input type="hidden" name="key"  value="{{page.key}}" /> 
  </form>
+{% endfor %}
  
-<form action="/admin/save" name="newRecord">
+<form action="/admin/save" method="POST" name="newRecord">
 URL: <input type="text" name="url" />
 HTML: <textarea name="html" rows=10 cols=40></textarea>
 <br />

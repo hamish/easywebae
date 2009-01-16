@@ -27,26 +27,38 @@ class MainHandler(webapp.RequestHandler):
         html=page.html 
     self.response.out.write(html)
 
-class EditHandler(webapp.RequestHandler):
+class AdminHandler(webapp.RequestHandler):
   def get(self):
     pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
     values = {
               'pages' : pages,
               }
-    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'edit.html')
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'admin.html')
     self.response.out.write(template.render(path, values))
 
 class SaveHandler(webapp.RequestHandler):
-  def get(self):
+  def post(self):
     page=Page()
     page.url = self.request.get('url')
     page.html = self.request.get('html')
     page.put()
     self.redirect('/admin/')
 
+class EditHandler(webapp.RequestHandler):
+  def post(self):
+    key_name = self.request.get('key')
+    page= db.get(db.Key(key_name))
+    page.url = self.request.get('url')
+    page.html = self.request.get('html')
+    page.put()
+    self.redirect('/admin/')
+
+
+
 def main():
-  application = webapp.WSGIApplication([('/admin/?', EditHandler),
+  application = webapp.WSGIApplication([('/admin/?', AdminHandler),
                                         ('/admin/save/?', SaveHandler),
+                                        ('/admin/edit/?', EditHandler),
                                         ('.*', MainHandler),
                                         ])
   wsgiref.handlers.CGIHandler().run(application)
