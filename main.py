@@ -38,21 +38,25 @@ class AdminHandler(webapp.RequestHandler):
 
 class SaveHandler(webapp.RequestHandler):
   def post(self):
+    key_name = self.request.get('key')
     page=Page()
+    if (key_name):
+        page= db.get(db.Key(key_name))
     page.url = self.request.get('url')
     page.html = self.request.get('html')
     page.put()
     self.redirect('/admin/')
 
 class EditHandler(webapp.RequestHandler):
-  def post(self):
+  def get(self):
     key_name = self.request.get('key')
     page= db.get(db.Key(key_name))
-    page.url = self.request.get('url')
-    page.html = self.request.get('html')
-    page.put()
-    self.redirect('/admin/')
+    values = {
+              'page' : page,
+              }
 
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'edit.html')
+    self.response.out.write(template.render(path, values))
 
 
 def main():

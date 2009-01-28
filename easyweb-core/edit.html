@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<title>easywebAE admin</title>
-		<!-- 
+		<!--
  		<script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
 		<script type="text/javascript">bkLib.onDomLoaded(nicEditors.allTextAreas);</script>
 		-->
@@ -24,21 +24,15 @@
 			}); 
 			myEditor.render(); 
 		</script>		
-		
 	</head>
 	<body class="yui-skin-sam"> 
-		{% for page in pages %}
-		URL: {{page.url}} <a href="/admin/edit?key={{page.key}}" id="url_{{page.url}}">edit</a> <a href="{{page.url}}" id="go_{{page.url}}">go</a><br />
-
-		{% endfor %}
-		 
-		<form action="/admin/save" method="POST" name="newRecord">
-		URL: <input type="text" name="url" />
-		HTML: <div id="html_entry"><textarea id="html" name="html" rows=10 cols=40 ></textarea></div>
-		<br />
-		<input type="submit" value="Save" name="Save"/>
-		</form>
-
+		<form action="/admin/save" method="POST" name="url_{{page.url}}">
+			URL: <input type="text" name="url" value="{{page.url}}" />
+			HTML: <div id="html_entry"><textarea id="html" name="html" rows=10 cols=40>{{page.html}}</textarea></div>
+			<br />
+			<input type="submit" name="Save" value="Save Changes" />
+			<input type="hidden" name="key"  value="{{page.key}}" /> 
+		 </form>
 
 	</body>
 </html>
