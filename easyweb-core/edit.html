@@ -1,11 +1,6 @@
 <html>
 	<head>
 		<title>easywebAE admin</title>
-		<!--
- 		<script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
-		<script type="text/javascript">bkLib.onDomLoaded(nicEditors.allTextAreas);</script>
-		-->
-		
 		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.6.0/build/assets/skins/sam/skin.css"> 
 		<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>  
 		<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/element/element-beta-min.js"></script>  
@@ -26,13 +21,16 @@
 		</script>		
 	</head>
 	<body class="yui-skin-sam"> 
-		<form action="/admin/save" method="POST" name="url_{{page.url}}">
+		<form action="../save/" method="POST" name="url_{{page.url}}">
 			URL: <input type="text" name="url" value="{{page.url}}" />
-			HTML: <div id="html_entry"><textarea id="html" name="html" rows=10 cols=40>{{page.html}}</textarea></div>
+			Title: <input type="text" name="title" value="{{page.title}}" />
+			<br />
+			<div id="html_entry"><textarea id="html" name="html" rows=10 cols=40>{{page.html|escape}}</textarea></div>
 			<br />
 			<input type="submit" name="Save" value="Save Changes" />
 			<input type="hidden" name="key"  value="{{page.key}}" /> 
 		 </form>
 
+		<a href="/admin/">Return to Admin</a>
 	</body>
 </html>

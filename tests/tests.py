@@ -2,7 +2,7 @@ from selenium import selenium
 import unittest, time, re
 
 global form, url_field, html_field, save_button, editor_locator
-form = "//form[@name='newRecord']"
+form = "//form[@name='url_']"
 url_field = form + "//input[@name='url']"
 html_field = form + "//textarea[@name='html']"
 save_button = form + "//input[@name='Save']"
@@ -12,7 +12,7 @@ save_button = form + "//input[@name='Save']"
 #editor_locator = "//iframe[@id='html_editor']/html/body"
 editor_locator = "//html/body"
 
-class NewTest(unittest.TestCase):
+class EasywebTests(unittest.TestCase):
 
     def setRichTextContent(self, sel, body):
         html_data = "<body>" + body + "</body>"
@@ -24,18 +24,15 @@ class NewTest(unittest.TestCase):
 
 
     def create_new_record(self, sel, current_time, body):
+        sel.click("link=New Page")
+        sel.wait_for_page_to_load("30000")
+        # sleep a bit longer to give the rich text editor a chance to load.
         time.sleep(2)
+        self.assertNewRecordForm(sel)
         #Enter data for a new record       
-        sel.type(url_field, "/test_" + current_time)
-        
-        #body = "MY Test[" + current_time + "]"
-        #html_data = "<html>\n<head>\n<title>Create Test</title>\n</head>\n<body>\n" + body + "\n</body>\n</html>"
+        sel.type(url_field, "/test_" + current_time)        
         self.setRichTextContent(sel, body)
-#        sel.select_frame("index=0")
-#        sel.focus(editor_locator)
-#        sel.type_keys(editor_locator,body )
-#        sel.select_frame("index=top")
-        
+
         sel.click(save_button)
         sel.wait_for_page_to_load("30000")
     
@@ -57,9 +54,10 @@ class NewTest(unittest.TestCase):
         sel = self.selenium
         current_time = self.get_time()
 
-        sel.open("/admin")
+        sel.open("/admin/")
         #test_html_content = "<html>\n<head>\n<title>Update Test</title>\n</head>\n<body>\nMY Test[" + current_time + "]\n</body>\n</html>"
         body = "MY Test[" + current_time + "]"
+        
         self.create_new_record(sel, current_time, body)
         
         update_link="//a[@id='url_/test_" + current_time + "']"
@@ -91,7 +89,7 @@ class NewTest(unittest.TestCase):
         # go to the old URL - should give the standard error message
         sel.open("/test_" + current_time)
         sel.wait_for_page_to_load("30000")
-        self.assertEqual(sel.get_body_text(), "nothing here")
+        self.failUnless(sel.is_text_present("The URL was not found"))
 
         # go to the new URL - should give the new content.
         sel.open("/test_" + current_time + "_updated")
@@ -99,23 +97,18 @@ class NewTest(unittest.TestCase):
         
         #validate the values present.
         #self.assertEqual(sel.get_title(), "Update Test - Updated")
-        self.assertEqual(sel.get_body_text(), "MY Test["+ current_time +"] updated")
+        #self.assertEqual(sel.get_body_text(), "MY Test["+ current_time +"] updated")
         self.failUnless(sel.is_text_present("MY Test["+ current_time +"] updated"))
         
     def test_simple_insert(self):
         sel = self.selenium
         #current_time = "%f" % time.time()
         current_time = self.get_time()
-        sel.open("/admin")
+        sel.open("/admin/")
         
         body_text= "MY Test["+ current_time +"]"
-        self.assertNewRecordForm(sel)
         test_html_content = "<html>\n<head>\n<title>Create Test</title>\n</head>\n<body>\n" + body_text + "\n</body>\n</html>"
         self.create_new_record(sel, current_time, test_html_content)
-        #self.create_new_record(sel, current_time, body_text)
-        
-        # re-validate that the new filed form is present.
-        self.assertNewRecordForm(sel)
         
         update_link="//a[@id='url_/test_" + current_time + "']"
         self.failUnless(sel.is_element_present(update_link))
@@ -134,7 +127,7 @@ class NewTest(unittest.TestCase):
         
         #validate the values present.
         #self.assertEqual(sel.get_title(), "Create Test")
-        self.assertEqual(sel.get_body_text(), body_text)
+        #self.assertEqual(sel.get_body_text(), body_text)
         self.failUnless(sel.is_text_present(body_text))
     
     def tearDown(self):
