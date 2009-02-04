@@ -3,6 +3,13 @@ import unittest, time, re
 
 class EasywebTests(unittest.TestCase):
 
+    def set_page_values_and_submit(self, sel, url_label, url, title, body):
+        self.validate_and_type(sel, "//form[@name='url_" + url_label + "']//input[@name='url']", url)
+        self.validate_and_type(sel, "//form[@name='url_" + url_label + "']//input[@name='title']", title)
+        self.setRichTextContent(sel, body)
+        self.click_and_wait(sel, "//form[@name='url_" + url_label + "']//input[@name='Save']")
+
+
     def assert_error_page(self, sel, url):
         self.open_and_wait(sel, url)
         self.failUnless(sel.is_text_present("The URL was not found"))
@@ -10,10 +17,16 @@ class EasywebTests(unittest.TestCase):
     def upadate_page(self, sel, old_url, new_url, new_title, new_body):
         self.open_and_wait(sel, "/admin/")
         self.click_and_wait(sel, "edit_" + old_url)
-        self.validate_and_type(sel, "//form[@name='url_" + old_url + "']//input[@name='url']", new_url)
-        self.validate_and_type(sel, "//form[@name='url_" + old_url + "']//input[@name='title']", new_title)
-        self.setRichTextContent(sel, new_body)
-        self.click_and_wait(sel, "//form[@name='url_" + old_url + "']//input[@name='Save']")
+        
+        self.set_page_values_and_submit(sel, old_url, new_url, new_title, new_body)
+
+    def create_new_page(self, sel, url, title, body):
+        self.open_and_wait(sel, "/admin/")       
+        self.click_and_wait(sel, "new")
+        # give the rich text editor some time to load - unsure if this is needed - Hamish
+        #time.sleep(2)
+
+        self.set_page_values_and_submit(sel, '', url, title, body)
 
     def login(self, sel):
         self.open_and_wait(sel, "/admin/")
@@ -23,17 +36,6 @@ class EasywebTests(unittest.TestCase):
     def logout(self, sel):
         self.open_and_wait(sel, "/admin/")
         self.click_and_wait(sel, "logout")
-
-    def create_new_page(self, sel, url, title, body):
-        self.open_and_wait(sel, "/admin/")       
-        self.click_and_wait(sel, "new")
-        # give the rich text editor some time to load
-        time.sleep(2)
-        self.validate_and_type(sel, "//form[@name='url_']//input[@name='url']", url)
-        self.validate_and_type(sel, "//form[@name='url_']//input[@name='title']", title)
-        self.setRichTextContent(sel, body)
-        self.click_and_wait(sel, "//form[@name='url_']//input[@name='Save']")
-
 
     def open_and_wait(self, sel, url):
         sel.open(url)
@@ -61,7 +63,7 @@ class EasywebTests(unittest.TestCase):
     def setUp(self):
         self.selenium = selenium("localhost", 4444, "*custom firefox -p selenium -no-remote", "http://localhost:8080/")
         self.selenium.start()
-        # run the tests slowly so that a human can follow along.
+        # run the tests slowly so that a human can follow along. 
         # self.selenium.set_speed(500)
 
     def test_create_and_update(self):
