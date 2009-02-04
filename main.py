@@ -28,7 +28,7 @@ class MainHandler(webapp.RequestHandler):
     if (pages.count() < 1):
         path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'error.html')
         self.response.set_status(404)
-        self.response.out.write(template.render(path, {'url': url }))
+        self.response.out.write(template.render(path, {'url': url, 'is_admin': users.is_current_user_admin() }))
 
     else :
         page = pages.get()

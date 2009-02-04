@@ -3,11 +3,11 @@ import unittest, time, re
 
 class EasywebTests(unittest.TestCase):
 
-    def set_page_values_and_submit(self, sel, url_label, url, title, body):
-        self.validate_and_type(sel, "//form[@name='url_" + url_label + "']//input[@name='url']", url)
-        self.validate_and_type(sel, "//form[@name='url_" + url_label + "']//input[@name='title']", title)
+    def set_page_values_and_submit(self, sel, url, title, body):
+        self.validate_and_type(sel, "//form[@name='page_content']//input[@name='url']", url)
+        self.validate_and_type(sel, "//form[@name='page_content']//input[@name='title']", title)
         self.setRichTextContent(sel, body)
-        self.click_and_wait(sel, "//form[@name='url_" + url_label + "']//input[@name='Save']")
+        self.click_and_wait(sel, "//form[@name='page_content']//input[@name='Save']")
 
 
     def assert_error_page(self, sel, url):
@@ -18,15 +18,15 @@ class EasywebTests(unittest.TestCase):
         self.open_and_wait(sel, "/admin/")
         self.click_and_wait(sel, "edit_" + old_url)
         
-        self.set_page_values_and_submit(sel, old_url, new_url, new_title, new_body)
+        self.set_page_values_and_submit(sel, new_url, new_title, new_body)
 
     def create_new_page(self, sel, url, title, body):
         self.open_and_wait(sel, "/admin/")       
         self.click_and_wait(sel, "new")
-        # give the rich text editor some time to load - unsure if this is needed - Hamish
-        #time.sleep(2)
-
-        self.set_page_values_and_submit(sel, '', url, title, body)
+        # Give the rich text editor some time to load 
+        # This appears to only be needed some of the time. Hamish
+        # time.sleep(2)
+        self.set_page_values_and_submit(sel, url, title, body)
 
     def login(self, sel):
         self.open_and_wait(sel, "/admin/")

@@ -5,6 +5,8 @@
 <body>
 <h1>Error Page</h1>
 The URL was not found.
-<a href="/admin/edit/?url={{url}}">Create</a>
+{% if is_admin %}
+<a href="/admin/edit/?url={{url}}" id="create">Create</a>
+{% endif %}
 </body>
 </html>
