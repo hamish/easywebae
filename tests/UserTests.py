@@ -38,12 +38,14 @@ class EasywebTests(unittest.TestCase):
 
         # Test the old URL - Should return an error
         self.assert_error_page(sel, url)
-        self.failUnless(sel.is_element_present("//a[@id='create']"))
+        # assert that the error page has a link to create the page (if user is logged in as an admin)
+        create_link = "//a[@id='create']"
+        self.failUnless(sel.is_element_present(create_link))
 
         # Try again after logging out - assert that the create link is not present.
         self.logout(sel)
         self.assert_error_page(sel, url)
-        self.failIf(sel.is_element_present("//a[@id='create']"))
+        self.failIf(sel.is_element_present(create_link))
         
         
         # Test the updated url. Should contain the new content and not the old content.
@@ -52,8 +54,6 @@ class EasywebTests(unittest.TestCase):
         self.failIf(sel.is_text_present(body))
 
 ################# Utility Methods
-
-
     def set_page_values_and_submit(self, sel, url, title, body):
         # Give the rich text editor some time to load 
         # This appears to only be needed some of the time. Hamish
@@ -89,7 +89,6 @@ class EasywebTests(unittest.TestCase):
     def open_and_wait(self, sel, url):
         sel.open(url)
         sel.wait_for_page_to_load("30000")
-
     
     def setRichTextContent(self, sel, body):
         html_data = "<body>" + body + "</body>"
@@ -102,12 +101,9 @@ class EasywebTests(unittest.TestCase):
         self.failUnless(sel.is_element_present(locator))
         sel.type(locator, value)
 
-
     def click_and_wait(self, sel, locator):
         sel.click(locator)
         sel.wait_for_page_to_load("30000")
-
-
 
 if __name__ == "__main__":
     unittest.main()
