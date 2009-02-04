@@ -7,7 +7,6 @@ class EasywebTests(unittest.TestCase):
         self.open_and_wait(sel, url)
         self.failUnless(sel.is_text_present("The URL was not found"))
 
-
     def upadate_page(self, sel, old_url, new_url, new_title, new_body):
         self.open_and_wait(sel, "/admin/")
         self.click_and_wait(sel, "edit_" + old_url)
@@ -16,18 +15,17 @@ class EasywebTests(unittest.TestCase):
         self.setRichTextContent(sel, new_body)
         self.click_and_wait(sel, "//form[@name='url_" + old_url + "']//input[@name='Save']")
 
+    def login(self, sel):
+        self.open_and_wait(sel, "/admin/")
+        sel.click("admin")
+        self.click_and_wait(sel, "submit-login")
+
+    def logout(self, sel):
+        self.open_and_wait(sel, "/admin/")
+        self.click_and_wait(sel, "logout")
 
     def create_new_page(self, sel, url, title, body):
-        self.open_and_wait(sel, "/admin/")
-        time.sleep(2)
-
-        # login
-        sel.click("admin")
-        sel.click("submit-login")
-        sel.wait_for_page_to_load("30000")
-        time.sleep(2)
-
-        
+        self.open_and_wait(sel, "/admin/")       
         self.click_and_wait(sel, "new")
         # give the rich text editor some time to load
         time.sleep(2)
@@ -63,6 +61,8 @@ class EasywebTests(unittest.TestCase):
     def setUp(self):
         self.selenium = selenium("localhost", 4444, "*custom firefox -p selenium -no-remote", "http://localhost:8080/")
         self.selenium.start()
+        # run the tests slowly so that a human can follow along.
+        # self.selenium.set_speed(500)
 
     def test_create_and_update(self):
         sel = self.selenium
@@ -72,12 +72,19 @@ class EasywebTests(unittest.TestCase):
         title="Title For Page %s" %current_time
         body="Body content for [%s]." %current_time
 
+        self.login(sel)
         self.create_new_page(sel, url, title, body)
         # Verify that the url works.
         self.open_and_wait(sel, url)
         self.failUnless(sel.is_text_present(body))
 
+        # Verify that the url works if you are logged out. 
+        self.logout(sel)
+        self.open_and_wait(sel, url)
+        self.failUnless(sel.is_text_present(body))
+
         #Edit the page
+        self.login(sel)
         new_url=url+"_updated"
         new_title = title + " updated"
         new_body = "Updated content for [%s]." % current_time
@@ -90,12 +97,9 @@ class EasywebTests(unittest.TestCase):
         self.open_and_wait(sel, new_url)
         self.failUnless(sel.is_text_present(new_body))
         self.failIf(sel.is_text_present(body))
-        
 
     def tearDown(self):
         self.selenium.stop()
-
-
 
 if __name__ == "__main__":
     unittest.main()
