@@ -5,6 +5,10 @@
 	<body>	
 		<h1>Easyweb admin</h1>
 		<a href="new/" id="new">New Page</a>
+		<form name="site_preferences" action="savePreferences/" method="POST" >
+		Anylitics Id: <input type="text" name="anylitics_id" value="{{preferences.anylitics_id}}" />
+		<input type="submit" name="Save" value="Save Changes" />
+		</form>
 		<hr />
 		<table> 
 			{% for page in pages %}

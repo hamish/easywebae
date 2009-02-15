@@ -19,10 +19,14 @@ class Page(db.Model):
     title = db.StringProperty()
     html = db.TextProperty()
     creation_date = db.DateTimeProperty(auto_now_add=True)
-    
+
+class Preferences(db.Model):
+    anylitics_id = db.StringProperty()
+        
 class MainHandler(webapp.RequestHandler):
   def get(self):
     url = self.request.path
+    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     pages=db.GqlQuery("SELECT * FROM Page WHERE url = :1 LIMIT 1", url)
     
     if (pages.count() < 1):
@@ -37,6 +41,7 @@ class MainHandler(webapp.RequestHandler):
         values = {
               'body' : html,
               'title' : title,
+              'preferences' : preference_list.get(),
                   }
         path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'content.html')
         self.response.out.write(template.render(path, values))
@@ -44,9 +49,11 @@ class MainHandler(webapp.RequestHandler):
 
 class AdminHandler(webapp.RequestHandler):
   def get(self):
+    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
     values = {
               'pages' : pages,
+              'preferences' : preference_list.get(),
               'logout_url': users.create_logout_url("/"),
               }
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'admin.html')
@@ -62,6 +69,16 @@ class SaveHandler(webapp.RequestHandler):
     page.title = self.request.get('title')
     page.html = self.request.get('html')
     page.put()
+    self.redirect('/admin/')
+
+class PreferencesHandler(webapp.RequestHandler):
+  def post(self):
+    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+    preferences = preference_list.get()
+    if (preference_list.count() < 1):    
+        preferences = Preferences()
+    preferences.anylitics_id = self.request.get('anylitics_id')
+    preferences.put()
     self.redirect('/admin/')
 
 class EditHandler(webapp.RequestHandler):
@@ -84,6 +101,7 @@ class EditHandler(webapp.RequestHandler):
 def main():
   application = webapp.WSGIApplication([('/admin/', AdminHandler),
                                         ('/admin/save/', SaveHandler),
+                                        ('/admin/savePreferences/', PreferencesHandler),
                                         ('/admin/new/', EditHandler),
                                         ('/admin/edit/', EditHandler),
                                         ('.*', MainHandler),

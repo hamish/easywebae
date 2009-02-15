@@ -3,14 +3,45 @@ import unittest, time, re
 
 class EasywebTests(unittest.TestCase):
 
+        
     def setUp(self):
         self.selenium = selenium("localhost", 4444, "*custom firefox -p selenium -no-remote", "http://localhost:8080/")
         self.selenium.start()
         # run the tests slowly so that a human can follow along. 
-        # self.selenium.set_speed(500)
 
     def tearDown(self):
         self.selenium.stop()
+        
+
+    def test_anylitics_id(self):
+        sel=self.selenium
+        current_time = self.get_time()
+        
+        self.login(sel)
+        sel.type("anylitics_id", "")
+        self.click_and_wait(sel,"Save")
+        
+
+        url = "/test_%s" % current_time
+        title = "Title For Page %s" % current_time
+        body = "Body content for [%s]." % current_time
+        self.create_new_page(sel, url, title, body)
+        
+        self.open_and_wait(sel, url)
+        self.failUnless(sel.is_text_present(body))
+
+        marker = '_gat._getTracker("'
+        self.assert_src_does_not_contain_element(sel, marker)        
+        
+        anylitics_id="UA-4796991-1"
+        self.open_and_wait(sel, "/admin/")
+        sel.type("anylitics_id", anylitics_id)
+        self.click_and_wait(sel,"Save")
+        
+        self.open_and_wait(sel, url)
+        self.assert_src_contains_element(sel, marker+anylitics_id)
+   
+
         
     def test_create_and_update(self):
         sel = self.selenium
@@ -104,6 +135,14 @@ class EasywebTests(unittest.TestCase):
     def click_and_wait(self, sel, locator):
         sel.click(locator)
         sel.wait_for_page_to_load("30000")
+
+    def assert_src_contains_element(self, sel, marker):
+        src = sel.get_html_source()
+        self.failIf(src.find(marker)==-1)
+    
+    def assert_src_does_not_contain_element(self, sel, marker):
+        src = sel.get_html_source()
+        self.failIf(src.find(marker)!=-1)
 
 if __name__ == "__main__":
     unittest.main()
