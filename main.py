@@ -42,6 +42,8 @@ class MainHandler(webapp.RequestHandler):
               'body' : html,
               'title' : title,
               'preferences' : preference_list.get(),
+              'url': url, 
+              'is_admin': users.is_current_user_admin()
                   }
         path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'content.html')
         self.response.out.write(template.render(path, values))
@@ -89,11 +91,14 @@ class EditHandler(webapp.RequestHandler):
     if (key_name):
         page= db.get(db.Key(key_name))
     elif (url):
-        page['url'] = url
+        pages=db.GqlQuery("SELECT * FROM Page WHERE url = :1 LIMIT 1", url)
+        if (pages.count(1)>0):
+            page=pages.get()
+        else:
+            page['url'] = url
     values = {
               'page' : page,
               }
-    
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'edit.html')
     self.response.out.write(template.render(path, values))
 

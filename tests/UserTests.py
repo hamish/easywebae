@@ -37,9 +37,20 @@ class EasywebTests(unittest.TestCase):
         self.open_and_wait(sel, "/admin/")
         sel.type("anylitics_id", anylitics_id)
         self.click_and_wait(sel,"Save")
+
+
+        # Admin user logged in - tracking should not be present, edit link should
+        edit_link = "//a[@id='edit']"
+        self.open_and_wait(sel, url)
+        self.assert_src_does_not_contain_element(sel, marker)        
+        self.failUnless(sel.is_element_present(edit_link))
         
+        
+        # Admin user not logged in - tracking should be present, edit link should not
+        self.logout(sel)
         self.open_and_wait(sel, url)
         self.assert_src_contains_element(sel, marker+anylitics_id)
+        self.failIf(sel.is_element_present(edit_link))
    
 
         
