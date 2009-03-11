@@ -1,0 +1,10 @@
+		<script type="text/javascript" src="/static/fckeditor/fckeditor.js"></script>
+		<script type="text/javascript">
+			window.onload = function()
+			{
+				var oFCKeditor = new FCKeditor( 'html' ) ;
+				oFCKeditor.BasePath = "/static/fckeditor/" ;
+				oFCKeditor.Config["CustomConfigurationsPath"] = "/static/myconfig.js"  ;
+				oFCKeditor.ReplaceTextarea() ;
+			}
+		</script>

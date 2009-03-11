@@ -1,29 +1,15 @@
 <html>
 	<head>
 		<title>easywebAE admin</title>
-		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.6.0/build/assets/skins/sam/skin.css"> 
-		<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/yahoo-dom-event/yahoo-dom-event.js"></script>  
-		<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/element/element-beta-min.js"></script>  
-		<script src="http://yui.yahooapis.com/2.6.0/build/container/container_core-min.js"></script> 
-		<script src="http://yui.yahooapis.com/2.6.0/build/menu/menu-min.js"></script> 
-		<script src="http://yui.yahooapis.com/2.6.0/build/button/button-min.js"></script> 
-		<script src="http://yui.yahooapis.com/2.6.0/build/editor/editor-min.js"></script>
-		 		 
-		<script type="text/javascript">
-			var myEditor = new YAHOO.widget.Editor('html', { 
-			    height: '300px', 
-			    width: '922px', 
-			    handleSubmit: true,
-			    dompath: true, //Turns on the bar at the bottom 
-			    animate: true //Animates the opening, closing and moving of Editor windows 
-			}); 
-			myEditor.render(); 
-		</script>		
+
+		{% include "rich_text_editor_head.html" %}
+			
 	</head>
 	<body class="yui-skin-sam"> 
 		<form action="../save/" method="POST" name="page_content">
 			URL: <input type="text" name="url" value="{{page.url}}" />
 			Title: <input type="text" name="title" value="{{page.title}}" />
+			Include In Sitemap" <input type="checkbox" value="true" name="include_in_sitemap" />
 			<br />
 			<div id="html_entry"><textarea id="html" name="html" rows=10 cols=40>{{page.html|escape}}</textarea></div>
 			<br />

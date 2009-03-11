@@ -99,7 +99,7 @@ class EasywebTests(unittest.TestCase):
     def set_page_values_and_submit(self, sel, url, title, body):
         # Give the rich text editor some time to load 
         # This appears to only be needed some of the time. Hamish
-        # time.sleep(2)
+        time.sleep(2)
         self.validate_and_type(sel, "//form[@name='page_content']//input[@name='url']", url)
         self.validate_and_type(sel, "//form[@name='page_content']//input[@name='title']", title)
         self.setRichTextContent(sel, body)
@@ -134,7 +134,8 @@ class EasywebTests(unittest.TestCase):
     
     def setRichTextContent(self, sel, body):
         html_data = "<body>" + body + "</body>"
-        sel.run_script("myEditor.setEditorHTML(" + html_data + ");")
+        script = "var oEditor = FCKeditorAPI.GetInstance('html'); oEditor.SetHTML(" + html_data + ");"
+        sel.run_script(script)
         
     def get_time(self):
         return "%.0f" % (time.time() * 10000)

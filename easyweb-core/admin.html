@@ -15,12 +15,13 @@
 			{% for page in pages %}
 			{% if forloop.first %}
 			<tr>
-				<td>URL</td><td>Title</td><td>&nbsp;</td><td>&nbsp;</td>
+				<td>URL</td><td>Title</td><td>Sitemap?</td><td>&nbsp;</td><td>&nbsp;</td>
 			</tr>
 			{% endif %}
 			<tr>
 				<td>{{page.url}}</td>
 				<td>{{page.title}}</td>
+				<td>{{page.include_in_sitemap}}</td>
 				<td><a href="/admin/edit/?key={{page.key}}" id="edit_{{page.url}}">edit</a></td>
 				<td><a href="{{page.url}}" id="go_{{page.url}}">go</a></td>
 			</tr>
