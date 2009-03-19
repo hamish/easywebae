@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<title>easywebAE admin: Web Pages</title>
+
+		{% include "head.html" %}
+
+	</head>
+	<body>	
+
+		{% include "menu.html" %}
+		
+		<h1>Web Pages</h1>
+		
+		<a href="new/" id="new">New Page</a>
+
+		<table cellpadding="0" cellspacing="0"> 
+			{% for page in pages %}
+			{% if forloop.first %}
+			<tr>
+				<th>URL</th>
+				<th>Title</th>
+				<th>Sitemap?</th>
+				<th>&nbsp;</th>
+				<th>&nbsp;</th>
+			</tr>
+			{% endif %}
+			<tr onmouseover="dojo.addClass(this, 'highlight')" onmouseout="dojo.removeClass(this, 'highlight')">
+				<td>{{page.url}}</td>
+				<td>{{page.title}}</td>
+				{% if page.include_in_sitemap %}
+				<td>Yes</td>
+				{% else %}
+				<td>No</td>
+				{% endif %}
+				<td><a href="/admin/edit/?key={{page.key}}" id="edit_{{page.url}}">edit</a></td>
+				<td><a href="{{page.url}}" id="go_{{page.url}}">go</a></td>
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>

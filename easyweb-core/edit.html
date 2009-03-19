@@ -2,10 +2,15 @@
 	<head>
 		<title>easywebAE admin</title>
 
+		{% include "head.html" %}
+
 		{% include "rich_text_editor_head.html" %}
 			
 	</head>
-	<body class="yui-skin-sam"> 
+	<body> 
+
+		{% include "menu.html" %}
+		
 		<form action="../save/" method="POST" name="page_content">
 			URL: <input type="text" name="url" value="{{page.url}}" />
 			Title: <input type="text" name="title" value="{{page.title}}" />

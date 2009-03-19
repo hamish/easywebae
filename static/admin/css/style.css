@@ -1,0 +1,72 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 76%;
+	background: #fff;
+}
+
+div.topbit {
+	background: #69c;
+}
+div.topbit h1 {
+	background: #2E5C8A;
+}
+div.topbit p.logout {
+	margin: 0;
+	padding: 0 5px 0;
+	float: right;
+}
+
+div.topbit ul {
+	height: 25px;
+	margin: 0;
+	padding: 3px 5px 0 5px;
+	list-style-type: none;
+}
+div.topbit ul li {
+	margin: 0 3px 0 0;
+	padding: 0 10px;
+	float: left;
+	background: #3D7AB8;
+}
+div.topbit a {
+	height: 25px;
+	font-weight: bold;
+	color: #fff;
+	line-height: 25px;
+	text-decoration: none;
+}
+div.topbit ul li.active {
+	background: #fff;
+}
+div.topbit ul li.active a {
+	color: #2E5C8A;
+}
+
+h1 {
+	margin: 0;
+	padding: 10px 5px;
+	color: #69c;
+	font-size: 1.7em;
+	font-weight: normal;
+}
+div.topbit h1 {
+	font-size: 2em;
+}
+
+/**** table styles ****/
+table {
+	margin: 5px;
+}
+table th, table td {
+	padding:2px 8px;
+	font-size: 1em;
+	text-align: left;
+}
+table th {
+	color: #3D7AB8;
+	font-weight: normal;
+}
+table td {
+}
