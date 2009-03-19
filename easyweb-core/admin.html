@@ -1,6 +1,24 @@
 <html>
 	<head>
 		<title>easywebAE admin</title>
+    <script type="text/javascript">
+    // <![CDATA[
+function SplitFile()
+{
+    var file = document.getElementById("product_file_upload").value;
+    file = file.replace(/\\/g, "/");
+    var parts = file.split("/");
+    var filename = parts[parts.length - 1];
+    
+    var bits = filename.split(".");
+    var ext = bits[bits.length - 1];
+    
+    document.getElementById("product_file_name").value = filename;    
+    document.getElementById("product_file_ext").value = ext.toLowerCase();
+}
+    // ]]>
+    </script>
+
 	</head>
 	<body>	
 		<h1>Easyweb admin</h1>
@@ -27,6 +45,26 @@
 			</tr>
 			{% endfor %}
 		</table> 
-		<a href="{{logout_url}}" id="logout">Logout</a>
+		<h2>Products:</h2>
+		<form enctype="multipart/form-data" name="new_product" action="saveProduct/" method="POST">
+		New Product:
+		Name: <input type="text" name="product_name" />
+		Price: <input type="text" name="product_price" />
+		Return URL: <input type="text" name="product_return_url" />
+		File (limit 10 meg): <input type="file" id="product_file_upload"name="product_file_upload" onchange="SplitFile();"/>
+		<input type="hidden" id="product_file_name"  name="product_file_name" value="" /> 
+		<input type="hidden" id="product_file_ext"  name="product_file_ext" value="" /> 
+		<input type="submit" />
+		</form>
+		{% for product in products %}
+		Name: {{product.name}}
+		Price: {{product.price}}
+		file_name: {{product.file_name}}
+		file_ext: {{product.file_ext}}
+		Return URL: {{product.return_url}} <a href="{{product.return_url}}">go</a>
+		File: <a href="/download/{{product.key}}/{{product.file_name}}">download</a>
+		<br /> 
+		{% endfor %}
+		<p><a href="{{logout_url}}" id="logout">Logout</a></p>
 	</body>
 </html>

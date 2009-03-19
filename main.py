@@ -5,9 +5,10 @@
 
 import cgi
 import os
-
+import re
 import wsgiref.handlers
-
+import logging
+import mimetypes
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -24,7 +25,30 @@ class Page(db.Model):
 
 class Preferences(db.Model):
     anylitics_id = db.StringProperty()
-        
+
+class Product(db.Model):
+    name = db.StringProperty()
+    price = db.IntegerProperty()
+    return_url = db.StringProperty()
+    file_name = db.StringProperty()
+    file_ext = db.StringProperty()
+    file_content = db.BlobProperty()
+    
+class DownloadHandler(webapp.RequestHandler):
+    def get(self):
+        url = self.request.path
+        match = re.match("/download/(.*)/", url)
+        key=match.groups()[0]
+        logging.debug ("key: %s" % key)
+        product= db.get(key)
+        if product.file_content:
+            mimetypes.init()            
+            #self.response.headers['Content-Type'] = 'image/jpeg'
+            self.response.headers['Content-Type'] = mimetypes.guess_type(product.file_name)[0]
+            self.response.out.write(product.file_content)
+        else:
+            self.error(404)
+
 class MainHandler(webapp.RequestHandler):
   def get(self):
     url = self.request.path
@@ -55,8 +79,10 @@ class AdminHandler(webapp.RequestHandler):
   def get(self):
     preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
+    products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
     values = {
               'pages' : pages,
+              'products' : products,
               'preferences' : preference_list.get(),
               'logout_url': users.create_logout_url("/"),
               }
@@ -98,6 +124,20 @@ class PreferencesHandler(webapp.RequestHandler):
     preferences.anylitics_id = self.request.get('anylitics_id')
     preferences.put()
     self.redirect('/admin/')
+    
+class ProductHandler(webapp.RequestHandler):
+    def post(self):
+        product = Product()
+        product.name=self.request.get('product_name')
+        product.price=int(self.request.get('product_price'))
+        product.return_url=self.request.get('product_return_url')
+        product.file_name=self.request.get('product_file_name')
+        product.file_ext=self.request.get('product_file_ext')
+        #product.file_name=self.request.POST[u'product_file_upload'].filename
+        my_content=self.request.get("product_file_upload")
+        product.file_content=db.Blob(my_content)    
+        product.put()
+        self.redirect('/admin/')
 
 class EditHandler(webapp.RequestHandler):
   def get(self):
@@ -125,8 +165,10 @@ def main():
   application = webapp.WSGIApplication([('/admin/', AdminHandler),
                                         ('/admin/save/', SaveHandler),
                                         ('/admin/savePreferences/', PreferencesHandler),
+                                        ('/admin/saveProduct/', ProductHandler),
                                         ('/admin/new/', EditHandler),
                                         ('/admin/edit/', EditHandler),
+                                        ('/download/.*', DownloadHandler),
                                         ('/Sitemap.xml', SitemapHandler),
                                         ('.*', MainHandler),
                                         ])

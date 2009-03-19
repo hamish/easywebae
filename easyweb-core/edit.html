@@ -9,7 +9,7 @@
 		<form action="../save/" method="POST" name="page_content">
 			URL: <input type="text" name="url" value="{{page.url}}" />
 			Title: <input type="text" name="title" value="{{page.title}}" />
-			Include In Sitemap" <input type="checkbox" value="true" name="include_in_sitemap" />
+			Include In Sitemap: <input type="checkbox" value="true" name="include_in_sitemap"  {% if page.include_in_sitemap %}CHECKED{% endif %}/>
 			<br />
 			<div id="html_entry"><textarea id="html" name="html" rows=10 cols=40>{{page.html|escape}}</textarea></div>
 			<br />

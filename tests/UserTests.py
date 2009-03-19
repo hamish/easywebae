@@ -2,12 +2,15 @@ from selenium import selenium
 import unittest, time, re
 
 class EasywebTests(unittest.TestCase):
-
+    """
+      TODO: 
+        Test for sitemap
+        
+    """
         
     def setUp(self):
         self.selenium = selenium("localhost", 4444, "*custom firefox -p selenium -no-remote", "http://localhost:8080/")
         self.selenium.start()
-        # run the tests slowly so that a human can follow along. 
 
     def tearDown(self):
         self.selenium.stop()
