@@ -77,6 +77,14 @@ class MainHandler(webapp.RequestHandler):
 
 class AdminHandler(webapp.RequestHandler):
   def get(self):
+    template_name = 'admin.html'
+    url=self.request.path
+    match = re.match("/admin/(.*)$", url)
+    if match:
+        my_file=match.groups()[0]
+        logging.debug ("template: %s" % my_file)
+        if template:
+            template_name=my_file
     preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
     products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
@@ -86,7 +94,7 @@ class AdminHandler(webapp.RequestHandler):
               'preferences' : preference_list.get(),
               'logout_url': users.create_logout_url("/"),
               }
-    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'admin.html')
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', template_name)
     self.response.out.write(template.render(path, values))
 
 class SitemapHandler(webapp.RequestHandler):
@@ -162,7 +170,8 @@ class EditHandler(webapp.RequestHandler):
 
 
 def main():
-  application = webapp.WSGIApplication([('/admin/', AdminHandler),
+  application = webapp.WSGIApplication([('/admin/[a-z]*.html', AdminHandler),
+                                        ('/admin/', AdminHandler),
                                         ('/admin/save/', SaveHandler),
                                         ('/admin/savePreferences/', PreferencesHandler),
                                         ('/admin/saveProduct/', ProductHandler),
