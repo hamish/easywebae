@@ -9,11 +9,14 @@ import re
 import wsgiref.handlers
 import logging
 import mimetypes
+import urllib
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext import db
 from google.appengine.api import users
+from google.appengine.api import urlfetch
+from google.appengine.api import mail
 
 class Page(db.Model):
     url = db.StringProperty()
@@ -25,14 +28,27 @@ class Page(db.Model):
 
 class Preferences(db.Model):
     anylitics_id = db.StringProperty()
+    paypal_id = db.StringProperty()
 
 class Product(db.Model):
     name = db.StringProperty()
-    price = db.IntegerProperty()
+    price = db.StringProperty()
     return_url = db.StringProperty()
+    return_cancel_url = db.StringProperty()
     file_name = db.StringProperty()
     file_ext = db.StringProperty()
     file_content = db.BlobProperty()
+
+class Payment(db.Model):
+    first_name = db.StringProperty()
+    last_name = db.StringProperty()
+    payer_email = db.StringProperty()
+    txn_id = db.StringProperty()
+    item_name = db.StringProperty()
+    verification_url = db.StringProperty()
+    verification_result = db.StringProperty()
+    all_values = db.TextProperty()
+    creation_date = db.DateTimeProperty(auto_now_add=True)
     
 class DownloadHandler(webapp.RequestHandler):
     def get(self):
@@ -88,15 +104,31 @@ class AdminHandler(webapp.RequestHandler):
     preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
     products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
+    payments=db.GqlQuery("SELECT * FROM Payment ORDER BY creation_date")
     values = {
               'pages' : pages,
               'products' : products,
+              'payments' : payments,
               'preferences' : preference_list.get(),
               'logout_url': users.create_logout_url("/"),
               }
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', template_name)
     self.response.out.write(template.render(path, values))
 
+class TemplateHandler(webapp.RequestHandler):
+  def get(self):
+    url = self.request.url
+    pos = url.find('/', 9) # find the first / after the http:// part
+    domian= url[:pos]
+    products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
+    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+    values = {
+              'domain' :domian,
+              'products' : products,
+              'preferences' : preference_list.get(),
+              }
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'fcktemplate.xml')
+    self.response.out.write(template.render(path, values))
 class SitemapHandler(webapp.RequestHandler):
   def get(self):
     url = self.request.url
@@ -130,6 +162,8 @@ class PreferencesHandler(webapp.RequestHandler):
     if (preference_list.count() < 1):    
         preferences = Preferences()
     preferences.anylitics_id = self.request.get('anylitics_id')
+    preferences.paypal_id = self.request.get('paypal_id')
+    
     preferences.put()
     self.redirect('/admin/')
     
@@ -137,8 +171,9 @@ class ProductHandler(webapp.RequestHandler):
     def post(self):
         product = Product()
         product.name=self.request.get('product_name')
-        product.price=int(self.request.get('product_price'))
+        product.price=self.request.get('product_price')
         product.return_url=self.request.get('product_return_url')
+        product.return_cancel_url = self.get('product_return_cancel_url')
         product.file_name=self.request.get('product_file_name')
         product.file_ext=self.request.get('product_file_ext')
         #product.file_name=self.request.POST[u'product_file_upload'].filename
@@ -169,16 +204,120 @@ class EditHandler(webapp.RequestHandler):
     self.response.out.write(template.render(path, values))
 
 
+class FakePaymentHandler(webapp.RequestHandler):
+    def post(self):
+        payment = Payment()       
+        payment.first_name = self.request.get('first_name')
+        payment.last_name = self.request.get('last_name')
+        payment.payer_email = self.request.get('payer_email')
+        payment.txn_id = self.request.get('txn_id')
+        payment.item_name = self.request.get('item_name')
+        
+        payment.verification_url = "fake"
+        payment.verification_result = "fake"
+        payment.all_values = self.request.get('all_values')
+        payment.put()    
+        self.redirect('/admin/')
+        
+class PaypalIPNHandler(webapp.RequestHandler):
+    default_response_text = 'Nothing to see here'
+    live_url = "https://www.paypal.com/cgi-bin/webscr"
+    test_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
+
+    def post(self):
+        self.get()
+    def get(self):
+        logging.debug('1')
+        data = {}
+        for i in self.request.arguments():
+            data[i] = self.request.get(i)
+        logging.debug('2')
+            
+        verify_url = self.live_url
+        #if (data.get('test_ipn', '0')=='1'):
+        verify_url = self.test_url
+        data['cmd'] = '_notify-validate'
+        result = self.do_post(verify_url, data)
+        logging.debug('3')
+ 
+        verified =  (result == 'VERIFIED')
+        logging.debug('4')
+
+        payment = Payment()
+        r="huh?"
+        if verified:
+              r = "great"
+        else:
+              r = "badness"
+        logging.debug('5')
+
+        data['post+result'] = result 
+        data['url+to+verify'] = verify_url
+
+        logging.debug('6')
+        payment = Payment()
+        payment.first_name = self.request.get('first_name')
+        payment.last_name = self.request.get('last_name')
+        payment.payer_email = self.request.get('payer_email')
+        payment.txn_id = self.request.get('txn_id')
+        payment.item_name = self.request.get('item_name')
+        
+        payment.verification_url = verify_url
+        payment.verification_result = result
+        payment.all_values = dict_to_string(data)
+        payment.put()
+        logging.debug('7')
+
+        message = mail.EmailMessage(sender='hcurrie@gmail.com',
+                            subject='[IPN] process ' + r,
+                            to = 'hcurrie@gmail.com',
+                            body = dict_to_string(data))
+        logging.debug('8')
+        message.send()
+        logging.debug('9')
+        ### TODO: send email to user with download instructions
+        
+        self.response.out.write(r)
+
+    def do_post(self, url, args):
+        return urlfetch.fetch(
+            url = url,
+            method = urlfetch.POST,
+            payload = urllib.urlencode(args)
+        ).content
+
+    def verify(self, data):
+        verify_url = self.live_url
+        if (data.get('test_ipn', '0')=='1'):
+            verify_url = self.test_url
+        args = {
+            'cmd': '_notify-validate',
+        }
+        args.update(data)
+        result = self.do_post(verify_url, args) 
+        r = {'post_result': result }
+        r.update(data)
+        return  result == 'VERIFIED'
+    
+def dict_to_string(dict):
+    s=""
+    for key in dict.keys():
+        s="%s %s : %s \n" %(s,key,dict[key])
+    return s
+
 def main():
   application = webapp.WSGIApplication([('/admin/[a-z]*.html', AdminHandler),
                                         ('/admin/', AdminHandler),
                                         ('/admin/save/', SaveHandler),
                                         ('/admin/savePreferences/', PreferencesHandler),
                                         ('/admin/saveProduct/', ProductHandler),
+                                        ('/admin/savePayment/', FakePaymentHandler),
                                         ('/admin/new/', EditHandler),
                                         ('/admin/edit/', EditHandler),
                                         ('/download/.*', DownloadHandler),
                                         ('/Sitemap.xml', SitemapHandler),
+                                        ('/fcktemplate.xml', TemplateHandler),
+                                        ('/purchase/ipn/', PaypalIPNHandler),
                                         ('.*', MainHandler),
                                         ])
   wsgiref.handlers.CGIHandler().run(application)

@@ -13,8 +13,10 @@
 		<a href="new/" id="new">New Page</a>
 		<form name="site_preferences" action="savePreferences/" method="POST" >
 		Anylitics Id: <input type="text" name="anylitics_id" value="{{preferences.anylitics_id}}" />
+		Paypal Id: <input type="text" name="paypal_id" value="{{preferences.paypal_id}}" />
 		<input type="submit" name="Save" value="Save Changes" />
 		Testing ID = UA-4796991-1
+		Testing paypal Id = hcurri_1234182723_biz@gmail.com
 		</form>
 		<hr />
 		<table> 
@@ -33,16 +35,24 @@
 			</tr>
 			{% endfor %}
 		</table> 
-		<h2>Products:</h2>
+		<h2>Products:</h2>		Name: {{product.name}}
+		Price: {{product.price}}
+		file_name: {{product.file_name}}
+		file_ext: {{product.file_ext}}
+		Return URL: {{product.return_url}} <a href="{{product.return_url}}">go</a>
+		Return cancel URL: {{product.return_cancel_url}} <a href="{{product.return_cancel_url}}">go</a>
+		File: <a href="/download/{{product.key}}/{{product.file_name}}">download</a>
+		
 		<form enctype="multipart/form-data" name="new_product" action="saveProduct/" method="POST">
-		New Product:
-		Name: <input type="text" name="product_name" />
-		Price: <input type="text" name="product_price" />
-		Return URL: <input type="text" name="product_return_url" />
-		File (limit 10 meg): <input type="file" id="product_file_upload"name="product_file_upload" onchange="SplitFile();"/>
+		New Product:<br />
+		Name: <input type="text" name="product_name" /><br />
+		Price: <input type="text" name="product_price" /><br />
+		Return URL: <input type="text" name="product_return_url" /><br />
+		Return Cancel URL: <input type="text" name="product_return_cancel_url" /><br />
+		File (limit 10 meg): <input type="file" id="product_file_upload"name="product_file_upload" onchange="SplitFile();"/><br />
 		<input type="hidden" id="product_file_name"  name="product_file_name" value="" /> 
 		<input type="hidden" id="product_file_ext"  name="product_file_ext" value="" /> 
-		<input type="submit" />
+		<input type="submit" /><br />
 		</form>
 		{% for product in products %}
 		Name: {{product.name}}
@@ -50,9 +60,36 @@
 		file_name: {{product.file_name}}
 		file_ext: {{product.file_ext}}
 		Return URL: {{product.return_url}} <a href="{{product.return_url}}">go</a>
+		Return cancel URL: {{product.return_cancel_url}} <a href="{{product.return_cancel_url}}">go</a>
 		File: <a href="/download/{{product.key}}/{{product.file_name}}">download</a>
 		<br /> 
 		{% endfor %}
+		
+		<h2>Purchases:</h2>
+		<form name="new_payment" action="savePayment/" method="POST">
+			New Fake Payment:<br />
+		    first_name <input type="text" name="first_name" /><br />
+		    last_name <input type="text" name="last_name" /><br />
+		    payer_email <input type="text" name="payer_email" /><br />
+		    txn_id <input type="text" name="txn_id" /><br />
+		    item_name <input type="text" name="item_name" /><br />
+		    all_values <input type="text" name="all_values" /><br />
+		<input type="submit" /><br />
+		</form>
+		{% for payment in payments %}
+		    first_name {{payment.first_name}}<br />
+		    last_name {{payment.last_name}}<br />
+		    payer_email {{payment.payer_email}}<br />
+		    txn_id {{payment.txn_id}}<br />
+		    item_name {{payment.item_name}}<br />
+    		verification_url {{payment.verification_url}}<br />
+		    verification_result {{payment.verification_result}}<br />
+		    all_values {{payment.all_values}}<br />
+
+		<hr /> 
+		{% endfor %}
+		
+		
 		<p><a href="{{logout_url}}" id="logout">Logout</a></p>
 	</body>
 </html>

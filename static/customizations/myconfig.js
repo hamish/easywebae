@@ -1,1 +1,1 @@
-FCKConfig.TemplatesXmlPath = '/editor/fcktemplate.xml' ;
+FCKConfig.TemplatesXmlPath = '/fcktemplate.xml' ;
