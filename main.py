@@ -83,7 +83,7 @@ class AdminHandler(webapp.RequestHandler):
     if match:
         my_file=match.groups()[0]
         logging.debug ("template: %s" % my_file)
-        if template:
+        if my_file:
             template_name=my_file
     preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
