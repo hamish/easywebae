@@ -45,6 +45,8 @@ class Payment(db.Model):
     payer_email = db.StringProperty()
     txn_id = db.StringProperty()
     item_name = db.StringProperty()
+    item_number = db.StringProperty()
+    mc_gross = db.StringProperty()
     verification_url = db.StringProperty()
     verification_result = db.StringProperty()
     all_values = db.TextProperty()
@@ -212,6 +214,9 @@ class FakePaymentHandler(webapp.RequestHandler):
         payment.payer_email = self.request.get('payer_email')
         payment.txn_id = self.request.get('txn_id')
         payment.item_name = self.request.get('item_name')
+
+        payment.item_number = self.request.get('item_number')
+        payment.mc_gross = self.request.get('mc_gross')
         
         payment.verification_url = "fake"
         payment.verification_result = "fake"
@@ -261,6 +266,8 @@ class PaypalIPNHandler(webapp.RequestHandler):
         payment.payer_email = self.request.get('payer_email')
         payment.txn_id = self.request.get('txn_id')
         payment.item_name = self.request.get('item_name')
+        payment.item_number = self.request.get('item_number')
+        payment.mc_gross = self.request.get('mc_gross')
         
         payment.verification_url = verify_url
         payment.verification_result = result
