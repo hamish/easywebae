@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/date
+END
+php.js
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/date/php.js
+END
+HebrewDate.js
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/date/HebrewDate.js
+END
+IslamicDate.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/date/IslamicDate.js
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/date/README
+END
+posix.js
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/date/posix.js
+END

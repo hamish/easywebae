@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/dtl/filter
+END
+strings.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/dtl/filter/strings.js
+END
+misc.js
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/dtl/filter/misc.js
+END
+logic.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/dtl/filter/logic.js
+END
+htmlstrings.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/dtl/filter/htmlstrings.js
+END
+lists.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/dtl/filter/lists.js
+END
+dates.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/dtl/filter/dates.js
+END
+integers.js
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/dtl/filter/integers.js
+END

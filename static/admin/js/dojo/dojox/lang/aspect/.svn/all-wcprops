@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/lang/aspect
+END
+memoizer.js
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/lang/aspect/memoizer.js
+END
+cflow.js
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/lang/aspect/cflow.js
+END
+memoizerGuard.js
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/lang/aspect/memoizerGuard.js
+END
+counter.js
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/lang/aspect/counter.js
+END
+timer.js
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/lang/aspect/timer.js
+END
+tracer.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/lang/aspect/tracer.js
+END
+profiler.js
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/lang/aspect/profiler.js
+END

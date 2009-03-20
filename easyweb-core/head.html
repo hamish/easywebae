@@ -1,29 +1,15 @@
 <link rel="stylesheet" type="text/css" href="/static/admin/css/style.css">
+<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="/static/admin/css/ie.css" /><![endif]-->
 
 <script type="text/javascript">
-// <![CDATA[
-	function SplitFile()
-	{
-	    var file = document.getElementById("product_file_upload").value;
-	    file = file.replace(/\\/g, "/");
-	    var parts = file.split("/");
-	    var filename = parts[parts.length - 1];
-	    
-	    var bits = filename.split(".");
-	    var ext = bits[bits.length - 1];
-	    
-	    document.getElementById("product_file_name").value = filename;    
-	    document.getElementById("product_file_ext").value = ext.toLowerCase();
-	}
+    var djConfig = {
+    	isDebug:true, parseOnLoad:true
+    };
+</script>
+<script type="text/javascript" src="/static/admin/js/dojo/dojo/dojo.js"></script>
+<script type="text/javascript" src="/static/admin/js/general.js"></script>
 
-	window.onload = function ()
-	{
-	    document.getElementById("main-heading").innerHTML = document.domain;
-	    
-	    var url = document.URL;
-	    var currentPage = url.substring(url.lastIndexOf("/"), url.length);
-	    
-	    var menu = document.getElementById("menu");
-	}
-// ]]>
+<script type="text/javascript">
+    dojo.require("dijit.dijit"); // optimize: load dijit layer
+    dojo.require("dojo.parser");
 </script>

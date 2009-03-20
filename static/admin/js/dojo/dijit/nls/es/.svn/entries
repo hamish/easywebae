@@ -1,0 +1,52 @@
+8
+
+dir
+68
+http://svn.travel.com.au/flight-search/trunk/src/main/webapp/js/dojo/dijit/nls/es
+http://svn.travel.com.au/flight-search
+
+
+
+2009-01-05T07:06:19.476640Z
+11
+KCurrie
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+ecda59b5-05eb-4ca7-baeb-da7550dca9c7
+
+common.js
+file
+
+
+
+
+2009-01-13T06:43:11.000000Z
+890b48f17fb1a4c37ad47a43c8e60777
+2009-01-05T07:06:19.476640Z
+11
+KCurrie
+
+loading.js
+file
+
+
+
+
+2009-01-13T06:43:11.000000Z
+4b1d5d982196fef098cee2fbf0e0f722
+2009-01-05T07:06:19.476640Z
+11
+KCurrie
+

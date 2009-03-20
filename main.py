@@ -153,7 +153,7 @@ class SaveHandler(webapp.RequestHandler):
     page.html = self.request.get('html')
     page.include_in_sitemap =  (self.request.get('include_in_sitemap', 'false') == 'true')
     page.put()
-    self.redirect('/admin/')
+    self.redirect('/admin/pages.html')
 
 class PreferencesHandler(webapp.RequestHandler):
   def post(self):
@@ -173,7 +173,7 @@ class ProductHandler(webapp.RequestHandler):
         product.name=self.request.get('product_name')
         product.price=self.request.get('product_price')
         product.return_url=self.request.get('product_return_url')
-        product.return_cancel_url = self.get('product_return_cancel_url')
+        product.return_cancel_url = self.request.get('product_return_cancel_url')
         product.file_name=self.request.get('product_file_name')
         product.file_ext=self.request.get('product_file_ext')
         #product.file_name=self.request.POST[u'product_file_upload'].filename

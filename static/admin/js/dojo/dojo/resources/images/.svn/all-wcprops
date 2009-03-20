@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/resources/images
+END
+dndMove.png
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/resources/images/dndMove.png
+END
+dndNoCopy.png
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/resources/images/dndNoCopy.png
+END
+dndCopy.png
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/resources/images/dndCopy.png
+END
+dndNoMove.png
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/resources/images/dndNoMove.png
+END

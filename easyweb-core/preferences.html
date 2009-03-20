@@ -8,7 +8,30 @@
 
 		{% include "menu.html" %}
 		
-		<h1>Website Preferences</h1>
+		<div class="content">
+
+			<h1>Website Preferences</h1>
+		
+			<form name="site_preferences" action="savePreferences/" method="POST">
+				<table cellspacing="0" cellpadding="0">
+					<tr>
+						<td>Anylitics ID:</td>
+						<td><input class="anyliticsid" type="text" name="anylitics_id" value="{{preferences.anylitics_id}}" /></td>
+						<td rowspan="2" class="action"><button type="submit" name="Save"
+							onmouseover="dojo.addClass(this.parentNode, 'active')"
+							onmouseout="dojo.removeClass(this.parentNode, 'active')">Save Changes</button></td>
+					</tr>
+					<tr>
+						<td>Paypal ID:</td>
+						<td><input class="paypalid" type="text" name="paypal_id" value="{{preferences.paypal_id}}" /></td>
+
+					</tr>
+				</table>
+			</form>
+				
+			<p class="note">Testing Anylitics ID = UA-4796991-1
+				<br />Testing Paypal ID = hcurri_1234182723_biz@gmail.com</p>
+		</div>
 
 		
 	</body>

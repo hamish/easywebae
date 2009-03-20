@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/av/widget
+END
+ProgressSlider.js
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/av/widget/ProgressSlider.js
+END
+Player.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/av/widget/Player.js
+END
+PlayButton.js
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/av/widget/PlayButton.js
+END
+Status.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/av/widget/Status.js
+END
+VolumeButton.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/av/widget/VolumeButton.js
+END

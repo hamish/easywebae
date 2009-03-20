@@ -3,39 +3,124 @@
 		<title>easywebAE admin: Web Pages</title>
 
 		{% include "head.html" %}
+		
+		<script type="text/javascript">
+			function makeEditable(editNode, saveURL) {
+				var row = editNode.parentNode.parentNode;
+				var cells = row.childNodes;
+				
+				dojo.addClass(row, "editable");
+				
+				for (i = 0; i < cells.length; i++) {
+					if (dojo.hasClass(cells[i], "url")) {
+						var urlInput = createNamedInput("url");
+						dojo.attr(urlInput, "class", "url");
+						dojo.attr(urlInput, "value", cells[i].innerHTML);
+						cells[i].innerHTML = "";
+						cells[i].appendChild(urlInput);
+					}
+					else if (dojo.hasClass(cells[i], "title")) {
+						var titleInput = createNamedInput("title");
+						dojo.attr(titleInput, "class", "title");
+						dojo.attr(titleInput, "value", cells[i].innerHTML);
+						cells[i].innerHTML = "";
+						cells[i].appendChild(titleInput);
+					}
+					else if (dojo.hasClass(cells[i], "checkbox")) {
+						var sitemapSelect = document.createElement("select");
+						dojo.attr(sitemapSelect, "name", "include_in_sitemap");
+						
+						var yesOption = document.createElement("option");
+						dojo.attr(yesOption, "value", "true");
+						dojo.attr(yesOption, "innerHTML", "Yes");
+						dojo.attr(yesOption, "selected", cells[i].innerHTML == "Yes");
+						
+						var noOption = document.createElement("option");
+						dojo.attr(noOption, "value", "false");
+						dojo.attr(noOption, "innerHTML", "No");
+						dojo.attr(noOption, "selected", cells[i].innerHTML == "No");
+
+						cells[i].innerHTML = "";
+						sitemapSelect.appendChild(yesOption);
+						sitemapSelect.appendChild(noOption);
+						cells[i].appendChild(sitemapSelect);
+					}
+					else if (dojo.hasClass(cells[i], "go")) {
+						dojo.attr(cells[i].childNodes[0], "href", "");
+						dojo.attr(cells[i].childNodes[0], "innerHTML", "X");
+						dojo.attr(cells[i].childNodes[0], "onmouseover", "dojo.addClass(this.parentNode, 'activecancel')");
+						dojo.attr(cells[i].childNodes[0], "onmouseout", "dojo.removeClass(this.parentNode, 'activecancel')");
+						dojo.addClass(cells[i], "cancel");
+					}
+				}
+				
+				// change edit button to save button
+				dojo.attr(editNode, "innerHTML", "save");
+				editNode.blur();
+			}
+			
+			function createNamedInput(name) {
+				var element = null;
+				// Try the IE way; this fails on standards-compliant browsers
+				try {
+					element = document.createElement('<input name="'+name+'">');
+				} catch (e) {
+				}
+				if (!element || element.nodeName != 'INPUT') {
+					// Non-IE browser; use canonical method to create named element
+					element = document.createElement('input');
+					element.name = name;
+				}
+				return element;
+			}
+        
+		</script>
 
 	</head>
 	<body>	
 
 		{% include "menu.html" %}
-		
-		<h1>Web Pages</h1>
-		
-		<a href="new/" id="new">New Page</a>
 
-		<table cellpadding="0" cellspacing="0"> 
-			{% for page in pages %}
-			{% if forloop.first %}
-			<tr>
-				<th>URL</th>
-				<th>Title</th>
-				<th>Sitemap?</th>
-				<th>&nbsp;</th>
-				<th>&nbsp;</th>
-			</tr>
-			{% endif %}
-			<tr onmouseover="dojo.addClass(this, 'highlight')" onmouseout="dojo.removeClass(this, 'highlight')">
-				<td>{{page.url}}</td>
-				<td>{{page.title}}</td>
-				{% if page.include_in_sitemap %}
-				<td>Yes</td>
-				{% else %}
-				<td>No</td>
-				{% endif %}
-				<td><a href="/admin/edit/?key={{page.key}}" id="edit_{{page.url}}">edit</a></td>
-				<td><a href="{{page.url}}" id="go_{{page.url}}">go</a></td>
-			</tr>
-			{% endfor %}
-		</table>
+		<div class="content">
+			<h1>Web Pages</h1>
+			
+			<table cellpadding="0" cellspacing="0"> 
+				<tr>
+					<th>URL</th>
+					<th>Title</th>
+					<th>On Sitemap</th>
+					<th>&nbsp;</th>
+					<th>&nbsp;</th>
+				</tr>
+				
+				{% for page in pages %}
+				<tr>
+					<td class="url">{{page.url}}</td>
+					<td class="title">{{page.title}}</td>
+					<td class="checkbox">{% if page.include_in_sitemap %}Yes{% else %}No{% endif %}</td>
+					<td class="action"><button type="button" id="edit_{{page.url}}"
+						onclick="makeEditable(this, '/admin/edit/?key={{page.key}}')"
+						onmouseover="dojo.addClass(this.parentNode, 'active')"
+						onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</button></td>
+					<td class="action go"><a href="{{page.url}}" id="go_{{page.url}}"
+						onmouseover="dojo.addClass(this.parentNode, 'active')"
+						onmouseout="dojo.removeClass(this.parentNode, 'active')">go</a></td>
+				</tr>
+				{% endfor %}
+				
+				<tr class="new">
+					<td><input type="text" name="url" class="url" /></td>
+					<td><input type="text" name="title" class="title" /></td>
+					<td class="checkbox"><select name="include_in_sitemap"">
+						<option value="true">Yes</option>
+						<option value="false">No</option></select></td>
+					<td colspan="2" class="action"><a href="/admin/edit/"
+						onmouseover="dojo.addClass(this.parentNode, 'active')"
+						onmouseout="dojo.removeClass(this.parentNode, 'active')">add page</a></td>
+				</tr>
+			</table>
+			
+			<p><a href="new/" id="new">New Page</a></p>
+		</div>
 	</body>
 </html>

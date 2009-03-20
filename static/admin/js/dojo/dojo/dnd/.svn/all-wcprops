@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd
+END
+move.js
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/move.js
+END
+autoscroll.js
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/autoscroll.js
+END
+Mover.js
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/Mover.js
+END
+common.js
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/common.js
+END
+Manager.js
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/Manager.js
+END
+Moveable.js
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/Moveable.js
+END
+TimedMoveable.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/TimedMoveable.js
+END
+Avatar.js
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/Avatar.js
+END
+Selector.js
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/Selector.js
+END
+Source.js
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/Source.js
+END
+Container.js
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojo/dnd/Container.js
+END

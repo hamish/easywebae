@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire
+END
+TextAdapter.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/TextAdapter.js
+END
+Wire.js
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/Wire.js
+END
+XmlWire.js
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/XmlWire.js
+END
+TableAdapter.js
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/TableAdapter.js
+END
+CompositeWire.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/CompositeWire.js
+END
+_base.js
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/_base.js
+END
+DataWire.js
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/DataWire.js
+END
+TreeAdapter.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/TreeAdapter.js
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/wire/README
+END

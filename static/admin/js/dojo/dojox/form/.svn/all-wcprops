@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form
+END
+_FormSelectWidget.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/_FormSelectWidget.js
+END
+PasswordValidator.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/PasswordValidator.js
+END
+_SelectStackMixin.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/_SelectStackMixin.js
+END
+FileUploader.js
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/FileUploader.js
+END
+BusyButton.js
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/BusyButton.js
+END
+DropDownStack.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/DropDownStack.js
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/README
+END
+MultiComboBox.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/MultiComboBox.js
+END
+RadioStack.js
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/RadioStack.js
+END
+Rating.js
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/Rating.js
+END
+_HasDropDown.js
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/_HasDropDown.js
+END
+FileInputAuto.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/FileInputAuto.js
+END
+DateTextBox.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/DateTextBox.js
+END
+FilePickerTextBox.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/FilePickerTextBox.js
+END
+DropDownSelect.js
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/DropDownSelect.js
+END
+TimeSpinner.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/TimeSpinner.js
+END
+RangeSlider.js
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/RangeSlider.js
+END
+FileInput.js
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/FileInput.js
+END
+CheckedMultiSelect.js
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/form/CheckedMultiSelect.js
+END

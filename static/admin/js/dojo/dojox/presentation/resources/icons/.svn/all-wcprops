@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/presentation/resources/icons
+END
+prev.png
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/presentation/resources/icons/prev.png
+END
+next.png
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/presentation/resources/icons/next.png
+END
+up.png
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/presentation/resources/icons/up.png
+END
+down.png
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/presentation/resources/icons/down.png
+END

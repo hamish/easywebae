@@ -41,7 +41,7 @@ div.topbit ul li.active {
 	background: #fff;
 }
 div.topbit ul li.active a {
-	color: #2E5C8A;
+	color: #3D7AB8;
 }
 
 h1 {
@@ -55,18 +55,120 @@ div.topbit h1 {
 	font-size: 2em;
 }
 
+/**** content styles ****/
+div.content {
+	margin: 20px 10px;
+}
+
+a {
+	text-decoration: none;
+	color: #2E5C8A;
+}
+
+.error {
+	color: #c00;
+}
+ul.error {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+ul.error li {
+	margin-top: 2px;
+}
+.note {
+	color: #666;
+	font-size: 0.9em;
+}
+
+
 /**** table styles ****/
 table {
-	margin: 5px;
+	margin: 0;
 }
 table th, table td {
-	padding:2px 8px;
-	font-size: 1em;
-	text-align: left;
+	padding: 1px 8px;
+	line-height: 1.8em;
+	font-size: 0.8em;
+	vertical-align: middle;
 }
 table th {
 	color: #3D7AB8;
 	font-weight: normal;
+	text-align: left;
 }
 table td {
+	background: #ECF2F8;
+	border-bottom: 3px solid #fff;
 }
+table td.action {
+	text-align: center;
+	background: #C0D4E8;
+	border-left: 1px solid #fff;
+}
+table td.active {
+	background: #3D7AB8;
+}
+table td button {
+	color: #2E5C8A;
+	font-size: 1em;
+	background: transparent;
+	border: none;
+}
+table td.active a,
+	table td.active button {
+	color: #fff;
+}
+table tr.new td {
+	background: #F2F8EC;
+}
+table tr.new td.action {
+	background: #D9EAC8;
+}
+table tr.new td.active {
+	background: #99CC66;
+}
+table.problem tr th {
+	color: #993333;
+}
+table.problem tr td {
+	background: #F8ECEC;
+}
+table.problem tr td.action {
+	background: #ECC7C6;
+}
+table.problem tr td.active {
+	background: #CC6666;
+}
+table.problem td button {
+	color: #993333;
+}
+table.problem td.active button {
+	color: #fff;
+}
+table tr td.cancel {
+	color: #993333;
+	background: #ECC7C6;
+}
+table tr td.cancel a {
+	color: #993333;
+}
+table tr td.activecancel {
+	background: #D27979;
+}
+table tr td.activecancel a {
+	color: #fff;
+}
+table tr.spacer th {
+	line-height: 1em;
+}
+table td.checkbox { text-align: center; }
+
+/**** form styles ****/
+input, select { vertical-align: middle; }
+input.url { width: 120px; }
+input.title { width: 260px; }
+input.anyliticsid { width: 180px; }
+input.paypalid { width: 300px; }
+input.name { width: 200px; }
+input.price { width: 50px; }

@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout
+END
+FloatingPane.js
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/FloatingPane.js
+END
+GridContainer.js
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/GridContainer.js
+END
+ToggleSplitter.js
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/ToggleSplitter.js
+END
+RadioGroup.js
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/RadioGroup.js
+END
+ResizeHandle.js
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/ResizeHandle.js
+END
+RotatorContainer.js
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/RotatorContainer.js
+END
+ContentPane.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/ContentPane.js
+END
+BorderContainer.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/BorderContainer.js
+END
+DragPane.js
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/DragPane.js
+END
+ExpandoPane.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/ExpandoPane.js
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/README
+END
+ScrollPane.js
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/flight-search/!svn/ver/13/trunk/src/main/webapp/js/dojo/dojox/layout/ScrollPane.js
+END
