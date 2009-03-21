@@ -10,16 +10,19 @@
 			function validateForm(form) {
 				// make sure EVERY field is validated before we return
 				var isValid = validateInput(form["title"], "title");
-				isValid = validateInput(form["url"], "URL") && isValid;
+				isValid = validateInput(form["url"], "URL", "/") && isValid;
 				
 				return isValid;
 			}
 			
-			function validateInput(input, title) {
+			function validateInput(input, title, startChar) {
 				if (input.value == "") {
 					dojo.byId(input.name + "Error").innerHTML = "Please enter a " + title;
 					input.focus();
 					return false;
+				}
+				else if (startChar && input.value.indexOf(0) != startChar) {
+					input.value = startChar + input.value;
 				}
 				
 				// clear the error message
