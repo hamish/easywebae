@@ -13,13 +13,15 @@ function SplitFile()
 }
 
 dojo.addOnLoad(function() {
-    dojo.byId("topsplash").innerHTML = document.domain;
+    dojo.query("topsplash").innerHTML = document.domain;
 
     // get url minus "http://"
     url = document.URL.substring(7, document.URL.length);
     var currentPage = url.substring(url.indexOf("/"), url.length);
     
-    var menuTabs = dojo.byId("menu").childNodes;
+    var menuTabs = dojo.query("menu").childNodes;
+    
+    if (!menuTabs) return;
     
     for (i = 0; i < menuTabs.length; i++) {
     	if (menuTabs[i].nodeName == "LI") {

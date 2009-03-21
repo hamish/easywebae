@@ -1,33 +1,12 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
 		<title>easywebAE admin: Web Pages</title>
 
 		{% include "head.html" %}
-		{% include "rich_text_editor_head.html" %}
-		
-	    <style type="text/css">
-	        @import "http://o.aolcdn.com/dojo/1.0/dijit/themes/tundra/tundra.css";
-	        @import "http://o.aolcdn.com/dojo/1.0/dojo/resources/dojo.css"
-	    </style>
-	    
-		<script type="text/javascript">
-			dojo.require("dijit.Dialog");
-			dojo.require("dijit.form.TextBox");
-			dojo.require("dijit.form.TimeTextBox");
-			dojo.require("dijit.form.Button");
-			dojo.require("dijit.form.DateTextBox");
-		</script>
-		
-		<script type="text/javascript">
-			
-			function showEditDialog() {
-				dijit.byId('editPage').show();
-			}
-        
-		</script>
 
 	</head>
-	<body class="tundra">
+	<body>
 
 		{% include "menu.html" %}
 
@@ -35,6 +14,7 @@
 			<h1>Web Pages</h1>
 			
 			<table cellpadding="0" cellspacing="0"> 
+				{% for page in pages %}
 				{% if forloop.first %}
 				<tr>
 					<th>URL</th>
@@ -44,16 +24,13 @@
 					<th>&nbsp;</th>
 				</tr>
 				{% endif %}
-				
-				{% for page in pages %}
 				<tr>
 					<td class="url">{{page.url}}</td>
 					<td class="title">{{page.title}}</td>
 					<td class="checkbox">{% if page.include_in_sitemap %}Yes{% else %}No{% endif %}</td>
-					<td class="action"><button type="button" id="edit_{{page.url}}"
-						onclick="showEditDialog(this);"
+					<td class="action"><a href="/admin/edit/?key={{page.key}}" id="edit_{{page.url}}"
 						onmouseover="dojo.addClass(this.parentNode, 'active')"
-						onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</button></td>
+						onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</a></td>
 					<td class="action go"><a href="{{page.url}}" id="go_{{page.url}}"
 						onmouseover="dojo.addClass(this.parentNode, 'active')"
 						onmouseout="dojo.removeClass(this.parentNode, 'active')">go</a></td>
@@ -61,36 +38,11 @@
 				{% endfor %}
 				
 				<tr class="new">
-					<td colspan="5" class="action"><button type="button"
-						onclick="showEditDialog();"
+					<td colspan="5" class="action"><a href="new/"
 						onmouseover="dojo.addClass(this.parentNode, 'active')"
-						onmouseout="dojo.removeClass(this.parentNode, 'active')">add a new page</button></td>
+						onmouseout="dojo.removeClass(this.parentNode, 'active')">add a new page</a></td>
 				</tr>
 			</table>
-			
-			<div dojoType="dijit.Dialog" id="editPage" title="Edit Page" execute="../save/">
-				<input type="hidden" name="key"  value="{{page.key}}" /> 
-			    <table cellpadding="0" cellspacing="0" style="width:750px;">
-					<tr>
-						<th>URL</th>
-						<th>Title</th>
-						<th>On Sitemap</th>
-						<th>&nbsp;</th>
-						<th>&nbsp;</th>
-					</tr>
-					<tr class="new">
-						<td><input type="text" name="url" class="url" /></td>
-						<td><input type="text" name="title" class="title" /></td>
-						<td class="checkbox"><select name="include_in_sitemap"">
-							<option value="true">Yes</option>
-							<option value="false">No</option></select></td>
-						<td colspan="2" class="action"><button type="submit"
-							onmouseover="dojo.addClass(this.parentNode, 'active')"
-							onmouseout="dojo.removeClass(this.parentNode, 'active')">save</button></td>
-					</tr>
-			    </table>
-			    <textarea id="html" name="html" rows="20" cols="40">{{page.html|escape}}</textarea>
-			</div>
 		</div>
 	</body>
 </html>

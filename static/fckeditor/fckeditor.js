@@ -31,7 +31,7 @@ var FCKeditor = function( instanceName, width, height, toolbarSet, value )
 	// Properties
 	this.InstanceName	= instanceName ;
 	this.Width			= width			|| '100%' ;
-	this.Height			= height		|| '200' ;
+	this.Height			= height		|| '400' ;
 	this.ToolbarSet		= toolbarSet	|| 'Default' ;
 	this.Value			= value			|| '' ;
 	this.BasePath		= FCKeditor.BasePath ;

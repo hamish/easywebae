@@ -1,27 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
-		<title>easywebAE admin</title>
+		<title>Edit Page</title>
 
 		{% include "head.html" %}
-
 		{% include "rich_text_editor_head.html" %}
+
+		<script type="text/javascript">
+			function validateForm(form) {
+				// make sure EVERY field is validated before we return
+				var isValid = validateInput(form["title"], "title");
+				isValid = validateInput(form["url"], "URL") && isValid;
+				
+				return isValid;
+			}
 			
+			function validateInput(input, title) {
+				if (input.value == "") {
+					dojo.byId(input.name + "Error").innerHTML = "Please enter a " + title;
+					input.focus();
+					return false;
+				}
+				
+				// clear the error message
+				dojo.byId(input.name + "Error").innerHTML = "";
+				return true;
+			}
+		</script>
+		
 	</head>
-	<body> 
+	<body>
 
 		{% include "menu.html" %}
 		
-		<form action="../save/" method="POST" name="page_content">
-			URL: <input type="text" name="url" value="{{page.url}}" />
-			Title: <input type="text" name="title" value="{{page.title}}" />
-			Include In Sitemap: <input type="checkbox" value="true" name="include_in_sitemap"  {% if page.include_in_sitemap %}CHECKED{% endif %}/>
-			<br />
-			<div id="html_entry"><textarea id="html" name="html" rows=10 cols=40>{{page.html|escape}}</textarea></div>
-			<br />
-			<input type="submit" name="Save" value="Save Changes" />
-			<input type="hidden" name="key"  value="{{page.key}}" /> 
-		 </form>
-
-		<a href="/admin/">Return to Admin</a>
+		<div class="content">
+			<h1>Edit Page</h1>
+			
+			<form onsubmit="return validateForm(this)" action="/admin/save/" method="POST" name="page_content">
+				<input type="hidden" name="key"  value="{{page.key}}" /> 
+			    <table cellpadding="0" cellspacing="0" style="width:100%;">
+					<tr>
+						<th>URL</th>
+						<th>Title</th>
+						<th>On Sitemap</th>
+						<th>&nbsp;</th>
+						<th>&nbsp;</th>
+					</tr>
+					<tr class="new">
+						<td><input type="text" id="url" name="url" class="url" value="{{page.url}}" /></td>
+						<td><input type="text" id="title" name="title" class="title" value="{{page.title}}" /></td>
+						<td><select name="include_in_sitemap"">
+							<option value="true">Yes</option>
+							<option value="false"{% if not page.include_in_sitemap %} selected="selected"{% endif %}>No</option></select></td>
+						<td class="action"><button type="submit"
+							onmouseover="dojo.addClass(this.parentNode, 'active')"
+							onmouseout="dojo.removeClass(this.parentNode, 'active')">save</button></td>
+						<td class="action" title="Cancel - your changes will not be saved"><a href="/admin/pages.html"
+							onmouseover="dojo.addClass(this.parentNode, 'activecancel')"
+							onmouseout="dojo.removeClass(this.parentNode, 'activecancel')">X</a></td>
+					</tr>
+			    </table>
+				
+				<ul class="error">
+					<li id="urlError"></li>
+					<li id="titleError"></li>
+				</ul>
+			
+			    <textarea id="html" name="html" rows="20" cols="40">{{page.html|escape}}</textarea>
+			</form>
+		</div>
 	</body>
-</html>
+</head>

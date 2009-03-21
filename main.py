@@ -182,7 +182,7 @@ class ProductHandler(webapp.RequestHandler):
         my_content=self.request.get("product_file_upload")
         product.file_content=db.Blob(my_content)    
         product.put()
-        self.redirect('/admin/')
+        self.redirect('/admin/book.html')
 
 class EditHandler(webapp.RequestHandler):
   def get(self):

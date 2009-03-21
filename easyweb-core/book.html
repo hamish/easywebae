@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
 		<title>easywebAE admin: The Book</title>
@@ -7,11 +8,25 @@
 		<script type="text/javascript">
 			function validateForm(form) {
 				// make sure EVERY field is validated before we return
-				var isValid = validateURL(form["product_return_cancel_url"],  "Cancel URL");
+				var isValid = validateFileUpload(form["product_file_upload"]);
+				isValid = validateURL(form["product_return_cancel_url"],  "Cancel URL") && isValid;
 				isValid = validateURL(form["product_return_url"], "Return URL") && isValid;
 				isValid = validatePrice(form["product_price"]) && isValid;
+				isValid = validateName(form["product_name"]) && isValid;
 				
 				return isValid;
+			}
+			
+			function validateName(input) {
+				if (input.value == "") {
+					dojo.byId(input.name + "Error").innerHTML = "Please enter a name";
+					input.focus();
+					return false;
+				}
+				
+				// clear the error message
+				dojo.byId(input.name + "Error").innerHTML = "";
+				return true;
 			}
 			
 			function validateURL(select, fieldTitle) {
@@ -43,68 +58,17 @@
 				dojo.byId(input.name + "Error").innerHTML = "";
 				return true;
 			}
-
-		    dojo.addOnLoad(function() {
-		    	var priceField = dojo.byId("product_price");
-		    	if (priceField.value != "") {
-		    		validatePrice(priceField);
-	    		}
-		    });
 			
-			function makeEditable(editNode) {
-				var row = editNode.parentNode.parentNode;
-				var cells = row.childNodes;
-				
-				dojo.addClass(row, "editable");
-				
-				for (i = 0; i < cells.length; i++) {
-					if (dojo.hasClass(cells[i], "name")) {
-						convertTextToInput(cells[i], "name", "name");
-					}
-					else if (dojo.hasClass(cells[i], "price")) {
-						// remove $ from price
-						var value = cells[i].innerHTML;
-						value = value.substring(1, value.length);
-						convertTextToInput(cells[i], "price", "price", value, document.createTextNode("$"));
-					}
-					else if (dojo.hasClass(cells[i], "go")) {
-						dojo.attr(cells[i].childNodes[0], "href", "");
-						dojo.attr(cells[i].childNodes[0], "innerHTML", "X");
-						dojo.attr(cells[i].childNodes[0], "onmouseover", "dojo.addClass(this.parentNode, 'activecancel')");
-						dojo.attr(cells[i].childNodes[0], "onmouseout", "dojo.removeClass(this.parentNode, 'activecancel')");
-						dojo.addClass(cells[i], "cancel");
-					}
+			function validateFileUpload(upload) {
+				if (upload.value == "") {
+					dojo.byId(upload.name + "Error").innerHTML = "Please choose a file to upload";
+					upload.focus;
+					return false;
 				}
 				
-				// change edit button to save button
-				dojo.attr(editNode, "innerHTML", "save");
-				editNode.blur();
-			}
-		    
-			function convertTextToInput(parent, name, class, value, textNode) {
-				if (!value) value = parent.innerHTML;
-				
-				var input = createNamedInput(name);
-				dojo.attr(input, "class", class);
-				dojo.attr(input, "value", value);
-				parent.innerHTML = "";
-				if (textNode) parent.appendChild(textNode);
-				parent.appendChild(input);
-			}
-			
-			function createNamedInput(name) {
-				var element = null;
-				// Try the IE way; this fails on standards-compliant browsers
-				try {
-					element = document.createElement('<input name="'+name+'">');
-				} catch (e) {
-				}
-				if (!element || element.nodeName != 'INPUT') {
-					// Non-IE browser; use canonical method to create named element
-					element = document.createElement('input');
-					element.name = name;
-				}
-				return element;
+				// clear the error message
+				dojo.byId(upload.name + "Error").innerHTML = "";
+				return true;
 			}
 		</script>
 	</head>
@@ -115,6 +79,7 @@
 		<div class="content">
 			<h1>The Book</h1>
 			
+			<form onsubmit="return validateForm(this)" enctype="multipart/form-data" id="new_product" name="new_product" action="saveProduct/" method="POST">
 			<table cellspacing="0" cellpadding="0">
 				<tr>
 					<th>Name</th>
@@ -127,19 +92,15 @@
 				
 				{% for product in products %}
 				<tr>
-					<td class="name">{{product.name}}</td>
-					<td class="price">${{product.price}}</td>
-					<td class="successURL"><a href="{{product.return_url}}">{{product.return_url}}</a></td>
-					<td class="failURL"><a href="{{product.return_cancel_url}}">{{product.return_cancel_url}}</a></td>
-					<td class="filename">{{product.file_name}}</td>
-					<td class="action"><button type="button"
-						onclick="makeEditable(this)"
-						onmouseover="dojo.addClass(this.parentNode, 'active')"
-						onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</button></td>
+					<td>{{product.name}}</td>
+					<td>${{product.price}}</td>
+					<td><a href="{{product.return_url}}">{{product.return_url}}</a></td>
+					<td><a href="{{product.return_cancel_url}}">{{product.return_cancel_url}}</a></td>
+					<td>{{product.file_name}}</td>
+					<th>&nbsp;</th>
 				</tr>
 				{% endfor %}
 				
-			<form onsubmit="return validateForm(this)" enctype="multipart/form-data" id="new_product" name="new_product" action="saveProduct/" method="POST">
 					<tr class="new">
 						<td><input class="name" type="text" name="product_name" /></td>
 						<td>$<input class="price" type="text" id="product_price" name="product_price" onchange="validatePrice(this)" /></td>
@@ -160,17 +121,19 @@
 							onmouseover="dojo.addClass(this.parentNode, 'active')"
 							onmouseout="dojo.removeClass(this.parentNode, 'active')">add</button></td>
 					</tr>
+			</table>
 
 				<input type="hidden" id="product_file_name"  name="product_file_name" value="" /> 
 				<input type="hidden" id="product_file_ext"  name="product_file_ext" value="" /> 
 			</form>
-			</table>
 				
-				<ul class="error">
-					<li id="product_priceError"></li>
-					<li id="product_return_urlError"></li>
-					<li id="product_return_cancel_urlError"></li>
-				</ul>
+			<ul class="error">
+				<li id="product_nameError"></li>
+				<li id="product_priceError"></li>
+				<li id="product_return_urlError"></li>
+				<li id="product_return_cancel_urlError"></li>
+				<li id="product_file_uploadError"></li>
+			</ul>
 		</div>
 	</body>
 </html>

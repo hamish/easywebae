@@ -89,7 +89,6 @@ table {
 table th, table td {
 	padding: 1px 8px;
 	line-height: 1.8em;
-	font-size: 0.8em;
 	vertical-align: middle;
 }
 table input, table select, table textarea {
@@ -143,21 +142,25 @@ table.problem tr td {
 table.problem tr td.action {
 	background: #ECC7C6;
 }
-table.problem tr td.active {
+table.problem tr td.active,
+table td.activecancel {
 	background: #CC6666;
 }
-table.problem td button {
+table.problem td a, table.problem td button,
+table td.cancel a {
 	color: #993333;
 }
-table tr td.cancel {
-	color: #993333;
+table tr.new td.cancel {
 	background: #ECC7C6;
 }
 table tr td.cancel a {
 	color: #993333;
 }
-table tr td.activecancel {
+table tr.new td.activecancel {
 	background: #D27979;
+}
+table tr td.activecancel a {
+	color: #fff;
 }
 table tr.editable td {
 	background: #F2E6D9;
@@ -174,12 +177,12 @@ table tr.editable td.active {
 table tr.spacer th {
 	line-height: 1em;
 }
-table td.checkbox { text-align: center; }
+table td.checkbox, table th.checkbox { text-align: center; }
 
 /**** form styles ****/
 input, select { vertical-align: middle; }
 input.url { width: 120px; }
-input.title { width: 260px; }
+input.title { width: 300px; }
 input.anyliticsid { width: 180px; }
 input.paypalid { width: 300px; }
 input.name { width: 200px; }
