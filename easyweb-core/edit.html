@@ -21,7 +21,7 @@
 					input.focus();
 					return false;
 				}
-				else if (startChar && input.value.indexOf(0) != startChar) {
+				else if (startChar && input.value.substring(0,1) != startChar) {
 					input.value = startChar + input.value;
 				}
 				
