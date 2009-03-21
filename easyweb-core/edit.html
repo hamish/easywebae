@@ -50,7 +50,7 @@
 						<th>&nbsp;</th>
 					</tr>
 					<tr class="new">
-						<td><input type="text" id="url" name="url" class="url" value="{{page.url}}" /></td>
+						<td><input type="text" id="url" name="url" class="url" onchange="validateInput(this, 'url', '/');" value="{{page.url}}" /></td>
 						<td><input type="text" id="title" name="title" class="title" value="{{page.title}}" /></td>
 						<td><select name="include_in_sitemap"">
 							<option value="true">Yes</option>
@@ -62,12 +62,12 @@
 							onmouseover="dojo.addClass(this.parentNode, 'activecancel')"
 							onmouseout="dojo.removeClass(this.parentNode, 'activecancel')">X</a></td>
 					</tr>
+					<tr>
+						<th id="urlError" class="error"></th>
+						<th id="titleError" class="error"></th>
+						<th colspan="3"></th>
+					</tr>
 			    </table>
-				
-				<ul class="error">
-					<li id="urlError"></li>
-					<li id="titleError"></li>
-				</ul>
 			
 			    <textarea id="html" name="html" rows="20" cols="40">{{page.html|escape}}</textarea>
 			</form>
