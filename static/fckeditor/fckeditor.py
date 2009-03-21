@@ -46,7 +46,7 @@ class FCKeditor(object):
 		self.InstanceName = instanceName
 		self.BasePath = '/fckeditor/'
 		self.Width = '100%'
-		self.Height = '200'
+		self.Height = '350'
 		self.ToolbarSet = 'Default'
 		self.Value = '';
 

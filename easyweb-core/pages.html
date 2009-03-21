@@ -3,81 +3,31 @@
 		<title>easywebAE admin: Web Pages</title>
 
 		{% include "head.html" %}
+		{% include "rich_text_editor_head.html" %}
+		
+	    <style type="text/css">
+	        @import "http://o.aolcdn.com/dojo/1.0/dijit/themes/tundra/tundra.css";
+	        @import "http://o.aolcdn.com/dojo/1.0/dojo/resources/dojo.css"
+	    </style>
+	    
+		<script type="text/javascript">
+			dojo.require("dijit.Dialog");
+			dojo.require("dijit.form.TextBox");
+			dojo.require("dijit.form.TimeTextBox");
+			dojo.require("dijit.form.Button");
+			dojo.require("dijit.form.DateTextBox");
+		</script>
 		
 		<script type="text/javascript">
-			function makeEditable(editNode, saveURL) {
-				var row = editNode.parentNode.parentNode;
-				var cells = row.childNodes;
-				
-				dojo.addClass(row, "editable");
-				
-				for (i = 0; i < cells.length; i++) {
-					if (dojo.hasClass(cells[i], "url")) {
-						var urlInput = createNamedInput("url");
-						dojo.attr(urlInput, "class", "url");
-						dojo.attr(urlInput, "value", cells[i].innerHTML);
-						cells[i].innerHTML = "";
-						cells[i].appendChild(urlInput);
-					}
-					else if (dojo.hasClass(cells[i], "title")) {
-						var titleInput = createNamedInput("title");
-						dojo.attr(titleInput, "class", "title");
-						dojo.attr(titleInput, "value", cells[i].innerHTML);
-						cells[i].innerHTML = "";
-						cells[i].appendChild(titleInput);
-					}
-					else if (dojo.hasClass(cells[i], "checkbox")) {
-						var sitemapSelect = document.createElement("select");
-						dojo.attr(sitemapSelect, "name", "include_in_sitemap");
-						
-						var yesOption = document.createElement("option");
-						dojo.attr(yesOption, "value", "true");
-						dojo.attr(yesOption, "innerHTML", "Yes");
-						dojo.attr(yesOption, "selected", cells[i].innerHTML == "Yes");
-						
-						var noOption = document.createElement("option");
-						dojo.attr(noOption, "value", "false");
-						dojo.attr(noOption, "innerHTML", "No");
-						dojo.attr(noOption, "selected", cells[i].innerHTML == "No");
-
-						cells[i].innerHTML = "";
-						sitemapSelect.appendChild(yesOption);
-						sitemapSelect.appendChild(noOption);
-						cells[i].appendChild(sitemapSelect);
-					}
-					else if (dojo.hasClass(cells[i], "go")) {
-						dojo.attr(cells[i].childNodes[0], "href", "");
-						dojo.attr(cells[i].childNodes[0], "innerHTML", "X");
-						dojo.attr(cells[i].childNodes[0], "onmouseover", "dojo.addClass(this.parentNode, 'activecancel')");
-						dojo.attr(cells[i].childNodes[0], "onmouseout", "dojo.removeClass(this.parentNode, 'activecancel')");
-						dojo.addClass(cells[i], "cancel");
-					}
-				}
-				
-				// change edit button to save button
-				dojo.attr(editNode, "innerHTML", "save");
-				editNode.blur();
-			}
 			
-			function createNamedInput(name) {
-				var element = null;
-				// Try the IE way; this fails on standards-compliant browsers
-				try {
-					element = document.createElement('<input name="'+name+'">');
-				} catch (e) {
-				}
-				if (!element || element.nodeName != 'INPUT') {
-					// Non-IE browser; use canonical method to create named element
-					element = document.createElement('input');
-					element.name = name;
-				}
-				return element;
+			function showEditDialog() {
+				dijit.byId('editPage').show();
 			}
         
 		</script>
 
 	</head>
-	<body>	
+	<body class="tundra">
 
 		{% include "menu.html" %}
 
@@ -85,6 +35,7 @@
 			<h1>Web Pages</h1>
 			
 			<table cellpadding="0" cellspacing="0"> 
+				{% if forloop.first %}
 				<tr>
 					<th>URL</th>
 					<th>Title</th>
@@ -92,6 +43,7 @@
 					<th>&nbsp;</th>
 					<th>&nbsp;</th>
 				</tr>
+				{% endif %}
 				
 				{% for page in pages %}
 				<tr>
@@ -99,7 +51,7 @@
 					<td class="title">{{page.title}}</td>
 					<td class="checkbox">{% if page.include_in_sitemap %}Yes{% else %}No{% endif %}</td>
 					<td class="action"><button type="button" id="edit_{{page.url}}"
-						onclick="makeEditable(this, '/admin/edit/?key={{page.key}}')"
+						onclick="showEditDialog(this);"
 						onmouseover="dojo.addClass(this.parentNode, 'active')"
 						onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</button></td>
 					<td class="action go"><a href="{{page.url}}" id="go_{{page.url}}"
@@ -109,18 +61,36 @@
 				{% endfor %}
 				
 				<tr class="new">
-					<td><input type="text" name="url" class="url" /></td>
-					<td><input type="text" name="title" class="title" /></td>
-					<td class="checkbox"><select name="include_in_sitemap"">
-						<option value="true">Yes</option>
-						<option value="false">No</option></select></td>
-					<td colspan="2" class="action"><a href="/admin/edit/"
+					<td colspan="5" class="action"><button type="button"
+						onclick="showEditDialog();"
 						onmouseover="dojo.addClass(this.parentNode, 'active')"
-						onmouseout="dojo.removeClass(this.parentNode, 'active')">add page</a></td>
+						onmouseout="dojo.removeClass(this.parentNode, 'active')">add a new page</button></td>
 				</tr>
 			</table>
 			
-			<p><a href="new/" id="new">New Page</a></p>
+			<div dojoType="dijit.Dialog" id="editPage" title="Edit Page" execute="../save/">
+				<input type="hidden" name="key"  value="{{page.key}}" /> 
+			    <table cellpadding="0" cellspacing="0" style="width:750px;">
+					<tr>
+						<th>URL</th>
+						<th>Title</th>
+						<th>On Sitemap</th>
+						<th>&nbsp;</th>
+						<th>&nbsp;</th>
+					</tr>
+					<tr class="new">
+						<td><input type="text" name="url" class="url" /></td>
+						<td><input type="text" name="title" class="title" /></td>
+						<td class="checkbox"><select name="include_in_sitemap"">
+							<option value="true">Yes</option>
+							<option value="false">No</option></select></td>
+						<td colspan="2" class="action"><button type="submit"
+							onmouseover="dojo.addClass(this.parentNode, 'active')"
+							onmouseout="dojo.removeClass(this.parentNode, 'active')">save</button></td>
+					</tr>
+			    </table>
+			    <textarea id="html" name="html" rows="20" cols="40">{{page.html|escape}}</textarea>
+			</div>
 		</div>
 	</body>
 </html>

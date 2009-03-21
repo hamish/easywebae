@@ -92,6 +92,9 @@ table th, table td {
 	font-size: 0.8em;
 	vertical-align: middle;
 }
+table input, table select, table textarea {
+	font-size: 1em;
+}
 table th {
 	color: #3D7AB8;
 	font-weight: normal;
@@ -115,8 +118,8 @@ table td button {
 	background: transparent;
 	border: none;
 }
-table td.active a,
-	table td.active button {
+div table td.active a,
+	div table td.active button {
 	color: #fff;
 }
 table tr.new td {
@@ -127,6 +130,9 @@ table tr.new td.action {
 }
 table tr.new td.active {
 	background: #99CC66;
+}
+table tr.new a, table tr.new button {
+	color: #206020;
 }
 table.problem tr th {
 	color: #993333;
@@ -143,9 +149,6 @@ table.problem tr td.active {
 table.problem td button {
 	color: #993333;
 }
-table.problem td.active button {
-	color: #fff;
-}
 table tr td.cancel {
 	color: #993333;
 	background: #ECC7C6;
@@ -156,8 +159,17 @@ table tr td.cancel a {
 table tr td.activecancel {
 	background: #D27979;
 }
-table tr td.activecancel a {
-	color: #fff;
+table tr.editable td {
+	background: #F2E6D9;
+}
+table tr.editable td.action {
+	background: #E2C8AB;
+}
+table tr.editable a, table tr.editable button {
+	color: #604020;
+}
+table tr.editable td.active {
+	background: #CC9966;
 }
 table tr.spacer th {
 	line-height: 1em;

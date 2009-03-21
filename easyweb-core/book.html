@@ -50,6 +50,62 @@
 		    		validatePrice(priceField);
 	    		}
 		    });
+			
+			function makeEditable(editNode) {
+				var row = editNode.parentNode.parentNode;
+				var cells = row.childNodes;
+				
+				dojo.addClass(row, "editable");
+				
+				for (i = 0; i < cells.length; i++) {
+					if (dojo.hasClass(cells[i], "name")) {
+						convertTextToInput(cells[i], "name", "name");
+					}
+					else if (dojo.hasClass(cells[i], "price")) {
+						// remove $ from price
+						var value = cells[i].innerHTML;
+						value = value.substring(1, value.length);
+						convertTextToInput(cells[i], "price", "price", value, document.createTextNode("$"));
+					}
+					else if (dojo.hasClass(cells[i], "go")) {
+						dojo.attr(cells[i].childNodes[0], "href", "");
+						dojo.attr(cells[i].childNodes[0], "innerHTML", "X");
+						dojo.attr(cells[i].childNodes[0], "onmouseover", "dojo.addClass(this.parentNode, 'activecancel')");
+						dojo.attr(cells[i].childNodes[0], "onmouseout", "dojo.removeClass(this.parentNode, 'activecancel')");
+						dojo.addClass(cells[i], "cancel");
+					}
+				}
+				
+				// change edit button to save button
+				dojo.attr(editNode, "innerHTML", "save");
+				editNode.blur();
+			}
+		    
+			function convertTextToInput(parent, name, class, value, textNode) {
+				if (!value) value = parent.innerHTML;
+				
+				var input = createNamedInput(name);
+				dojo.attr(input, "class", class);
+				dojo.attr(input, "value", value);
+				parent.innerHTML = "";
+				if (textNode) parent.appendChild(textNode);
+				parent.appendChild(input);
+			}
+			
+			function createNamedInput(name) {
+				var element = null;
+				// Try the IE way; this fails on standards-compliant browsers
+				try {
+					element = document.createElement('<input name="'+name+'">');
+				} catch (e) {
+				}
+				if (!element || element.nodeName != 'INPUT') {
+					// Non-IE browser; use canonical method to create named element
+					element = document.createElement('input');
+					element.name = name;
+				}
+				return element;
+			}
 		</script>
 	</head>
 	<body>	
@@ -71,14 +127,15 @@
 				
 				{% for product in products %}
 				<tr>
-					<td>{{product.name}}</td>
-					<td>${{product.price}}</td>
-					<td><a href="{{product.return_url}}">{{product.return_url}}</a></td>
-					<td><a href="{{product.return_cancel_url}}">{{product.return_cancel_url}}</a></td>
-					<td>{{product.file_name}}</td>
-					<td class="action"><a href=""
+					<td class="name">{{product.name}}</td>
+					<td class="price">${{product.price}}</td>
+					<td class="successURL"><a href="{{product.return_url}}">{{product.return_url}}</a></td>
+					<td class="failURL"><a href="{{product.return_cancel_url}}">{{product.return_cancel_url}}</a></td>
+					<td class="filename">{{product.file_name}}</td>
+					<td class="action"><button type="button"
+						onclick="makeEditable(this)"
 						onmouseover="dojo.addClass(this.parentNode, 'active')"
-						onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</a></td>
+						onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</button></td>
 				</tr>
 				{% endfor %}
 				
