@@ -187,3 +187,15 @@ input.anyliticsid { width: 180px; }
 input.paypalid { width: 300px; }
 input.name { width: 200px; }
 input.price { width: 50px; }
+
+/**** list styles ****/
+ul.links li a { color: #3E7DBB; }
+ul.links li a:hover, ul.links li a:hover:visited { color: #BB7D3E; }
+ul.links li a:visited { color: #592D86; }
+
+ul.links {
+	list-style-type: none;
+}
+ul.links li {
+	margin-bottom: 1em;
+}
