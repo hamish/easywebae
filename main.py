@@ -45,7 +45,7 @@ class Payment(db.Model):
     payer_email = db.StringProperty()
     txn_id = db.StringProperty()
     item_name = db.StringProperty()
-    item_number = db.StringProperty()
+    product_key = db.StringProperty()
     mc_gross = db.StringProperty()
     verification_url = db.StringProperty()
     verification_result = db.StringProperty()
@@ -58,7 +58,8 @@ class DownloadHandler(webapp.RequestHandler):
         match = re.match("/download/(.*)/", url)
         key=match.groups()[0]
         logging.debug ("key: %s" % key)
-        product= db.get(key)
+        payment = db.get(key)
+        product = db.get(payment.product_key)
         if product.file_content:
             mimetypes.init()            
             #self.response.headers['Content-Type'] = 'image/jpeg'
@@ -167,7 +168,7 @@ class PreferencesHandler(webapp.RequestHandler):
     preferences.paypal_id = self.request.get('paypal_id')
     
     preferences.put()
-    self.redirect('/admin/')
+    self.redirect('/admin/preferences.html')
     
 class ProductHandler(webapp.RequestHandler):
     def post(self):
@@ -186,7 +187,6 @@ class ProductHandler(webapp.RequestHandler):
 
 class EditHandler(webapp.RequestHandler):
   def get(self):
-    button_html= '<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post"><input type="hidden" name="cmd" value="_xclick"><input type="hidden" name="business" value="{{ paypal_id }}"><input type="hidden" name="item_name" value="{{ item_name }}"><input type="hidden" name="amount" value="{{ price_dollars_cents }}"><input type="hidden" name="currency_code" value="AUD"><input type="hidden" name="no_shipping" value="1"><input type="hidden" name="rm" value="1"><input type="hidden" name="return" value="http://localhost:8080/purchase/completed/"><input type="hidden" name="cancel_return" value="http://localhost:8080/purchase/canceled/"><input type="hidden" name="bn" value="Breakup09_BuyNow_WPS_AU"><input type="image" src="https://www.sandbox.paypal.com/en_AU/i/btn/btn_buynowCC_LG.gif" border="0" name="submit" alt=""><img alt="" border="0" src="https://www.sandbox.paypal.com/en_AU/i/scr/pixel.gif" width="1" height="1"></form>'
     key_name = self.request.get('key')
     url = self.request.get('url')
     page={}
@@ -200,11 +200,15 @@ class EditHandler(webapp.RequestHandler):
             page['url'] = url
     values = {
               'page' : page,
-              'button_html' : button_html,
               }
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'edit.html')
     self.response.out.write(template.render(path, values))
 
+class AdminRedirector(webapp.RequestHandler):
+    def post(self):
+        self.get()
+    def get(self):
+        self.redirect('/admin/pages.html')
 
 class FakePaymentHandler(webapp.RequestHandler):
     def post(self):
@@ -215,76 +219,99 @@ class FakePaymentHandler(webapp.RequestHandler):
         payment.txn_id = self.request.get('txn_id')
         payment.item_name = self.request.get('item_name')
 
-        payment.item_number = self.request.get('item_number')
+        payment.product_key = self.request.get('product_key')
         payment.mc_gross = self.request.get('mc_gross')
         
         payment.verification_url = "fake"
-        payment.verification_result = "fake"
+        payment.verification_result = self.request.get('verification_result')
         payment.all_values = self.request.get('all_values')
         payment.put()    
-        self.redirect('/admin/')
+        self.redirect('/admin/purchases.html')
         
 class PaypalIPNHandler(webapp.RequestHandler):
-    default_response_text = 'Nothing to see here'
     live_url = "https://www.paypal.com/cgi-bin/webscr"
     test_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
+
+    def get_verification_url(self, data):
+        verification_url = self.live_url
+        if (self.request.get('test_ipn', '0') == '1'):
+            verification_url = self.test_url     
+        data['verification+url'] = verification_url   
+        return verification_url
 
     def post(self):
         self.get()
     def get(self):
-        logging.debug('1')
         data = {}
         for i in self.request.arguments():
             data[i] = self.request.get(i)
-        logging.debug('2')
-            
-        verify_url = self.live_url
-        #if (data.get('test_ipn', '0')=='1'):
-        verify_url = self.test_url
         data['cmd'] = '_notify-validate'
-        result = self.do_post(verify_url, data)
-        logging.debug('3')
- 
-        verified =  (result == 'VERIFIED')
-        logging.debug('4')
+            
+        verification_url = self.get_verification_url(data)
+        result = self.do_post(verification_url, data)
+        data['ipn+post+result'] = result
+        ipn_verified =  (result == 'VERIFIED')
 
-        payment = Payment()
-        r="huh?"
-        if verified:
-              r = "great"
-        else:
-              r = "badness"
-        logging.debug('5')
+        product_key = self.request.get('item_number')
+        product = db.get(db.Key(product_key))
+        
+        paypal_price = self.request.get('mc_gross')
+        product_price = product.price
+        data['paypal+price'] =  paypal_price
+        data['product+price'] = product_price
+        price_verified = (paypal_price == product_price)
 
-        data['post+result'] = result 
-        data['url+to+verify'] = verify_url
-
-        logging.debug('6')
+        verified = (ipn_verified and price_verified)
+            
         payment = Payment()
         payment.first_name = self.request.get('first_name')
         payment.last_name = self.request.get('last_name')
         payment.payer_email = self.request.get('payer_email')
         payment.txn_id = self.request.get('txn_id')
         payment.item_name = self.request.get('item_name')
-        payment.item_number = self.request.get('item_number')
+        payment.product_key = self.request.get('item_number')
         payment.mc_gross = self.request.get('mc_gross')
         
-        payment.verification_url = verify_url
-        payment.verification_result = result
+        payment.verification_url = verification_url
+        if verified:
+            payment.verification_result = "Success"
+        else:
+            payment.verification_result = "Failure"
         payment.all_values = dict_to_string(data)
         payment.put()
-        logging.debug('7')
 
-        message = mail.EmailMessage(sender='hcurrie@gmail.com',
-                            subject='[IPN] process ' + r,
-                            to = 'hcurrie@gmail.com',
-                            body = dict_to_string(data))
-        logging.debug('8')
-        message.send()
-        logging.debug('9')
-        ### TODO: send email to user with download instructions
+        url = self.request.url
+        pos = url.find('/', 9) # find the first / after the http:// part
+        domain= url[:pos]
+            
+        template_values = {
+            'payment'     : payment,
+            'product'     : product,
+            'ipn_verified': ipn_verified,
+            'price_verified': price_verified,
+            'variables'   : dict_to_string(data),
+            'domain'      : domain,
+        }
+
+        subject=''
+        body=''
+        sender='hcurrie@gmail.com'
+        to = 'hcurrie@gmail.com'
+        if verified:
+            # send email to user
+            subject = "Verification Success"
+            path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'purchase_complete_email.html')
+            body = template.render(path, template_values)
+            #to = payment.payer_email
+        else:
+            # send email to admin
+            subject = "Verification Failure"
+            path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'purchase_validation_error_email.html')
+            body = template.render(path, template_values)
+        message = mail.EmailMessage(sender=sender, subject=subject, to = to, body = body)
+        message.send()            
         
-        self.response.out.write(r)
+        self.response.out.write('processing complete')
 
     def do_post(self, url, args):
         return urlfetch.fetch(
@@ -314,7 +341,7 @@ def dict_to_string(dict):
 
 def main():
   application = webapp.WSGIApplication([('/admin/[a-z]*.html', AdminHandler),
-                                        ('/admin/', AdminHandler),
+                                        ('/admin/', AdminRedirector),
                                         ('/admin/save/', SaveHandler),
                                         ('/admin/savePreferences/', PreferencesHandler),
                                         ('/admin/saveProduct/', ProductHandler),

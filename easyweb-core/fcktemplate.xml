@@ -7,7 +7,6 @@
       <![CDATA[
 			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 			<input type="hidden" name="business" value="{{preferences.paypal_id}}">
-			<input type="hidden" name="item_number" value="{{product.key}}">
 			{% include "fcktemplate_common_values.html" %}
 			<br />
 			</form>
@@ -22,7 +21,6 @@
       <![CDATA[
 			<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
 			<input type="hidden" name="business" value="hcurri_1234182723_biz@gmail.com">
-			<input type="hidden" name="item_number" value="{{product.key}}_test">
 			{% include "fcktemplate_common_values.html" %}
 			<br />(Sandbox)
 			</form>

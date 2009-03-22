@@ -73,6 +73,16 @@
 		    payer_email <input type="text" name="payer_email" /><br />
 		    txn_id <input type="text" name="txn_id" /><br />
 		    item_name <input type="text" name="item_name" /><br />
+		    product_key <select id="product_key" name="product_key">
+							{% for product in products %}
+							<option value="{{product.key}}">{{product.name}}</option>
+							{% endfor %}
+							</select><br />
+		    verification_result <select id="verification_result" name="verification_result">
+							<option>Success</option>
+							<option>Failure</option>
+							</select><br />
+
 		    all_values <input type="text" name="all_values" /><br />
 		<input type="submit" /><br />
 		</form>

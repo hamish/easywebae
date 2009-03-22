@@ -1,0 +1,15 @@
+There was an error with the purchase.
+
+{% if not ipn_verified %}The details that were passed to us were invalid according 
+to paypal. This may indicate that someone is trying to trick 
+our software into giving them a product without paying.{% endif %}
+{% if not price_verified %}The price that paypal reported was different to the price 
+that we have on file for the product. This may indicate that 
+someone may be trying to trick our software into giving them 
+a product without paying the full amount.
+
+Price paid at paypal: {{payment.mc_gross}}
+Price on File: {{product.price}}{% endif %}
+
+More Details:
+{{variables}}
