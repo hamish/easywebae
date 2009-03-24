@@ -14,7 +14,26 @@ class EasywebTests(unittest.TestCase):
 
     def tearDown(self):
         self.selenium.stop()
+
+    def test_sitemap(self):
+        sel = self.selenium
+        current_time = self.get_time()
+
+        self.login(sel)
         
+        url_included = "/test_sitemap_included_%s" % current_time
+        title = "Sitemap test %s" % current_time
+        body = "Body content for [%s]." % current_time
+        self.create_new_page(sel, url_included, title, body, 1)
+
+        url_excluded = "/test_sitemap__not_included_%s" % current_time
+        self.create_new_page(sel, url_excluded, title, body, 0)
+
+
+        self.click_and_wait(sel, "link=External Tools")
+        self.click_and_wait(sel, "link=sitemap")
+        self.assert_src_contains_element(sel, url_included)
+        self.assert_src_does_not_contain_element(sel, url_excluded)
 
     def test_anylitics_id(self):
         sel=self.selenium
@@ -64,7 +83,7 @@ class EasywebTests(unittest.TestCase):
 
         self.login(sel)
         self.create_new_page(sel, url, title, body)
-        # Verify that the url works while logged in.
+        # Verify that the url works while logged in.hl7 datatypes V3
         self.open_and_wait(sel, url)
         self.failUnless(sel.is_text_present(body))
 
@@ -96,12 +115,16 @@ class EasywebTests(unittest.TestCase):
         self.failIf(sel.is_text_present(body))
 
 ################# Utility Methods
-    def set_page_values_and_submit(self, sel, url, title, body):
+    def set_page_values_and_submit(self, sel, url, title, body, sitemap):
         # Give the rich text editor some time to load 
         # This appears to only be needed some of the time. Hamish
         time.sleep(2)
         self.validate_and_type(sel, "//form[@name='page_content']//input[@name='url']", url)
         self.validate_and_type(sel, "//form[@name='page_content']//input[@name='title']", title)
+        if (sitemap):
+            sel.select("include_in_sitemap", "label=Yes")
+        else:
+            sel.select("include_in_sitemap", "label=No")
         self.setRichTextContent(sel, body)
         self.click_and_wait(sel, "//form[@name='page_content']//button[@name='Save']")
 
@@ -109,15 +132,15 @@ class EasywebTests(unittest.TestCase):
         self.open_and_wait(sel, url)
         self.failUnless(sel.is_text_present("The URL was not found"))
 
-    def upadate_page(self, sel, old_url, new_url, new_title, new_body):
+    def upadate_page(self, sel, old_url, new_url, new_title, new_body, sitemap=0):
         self.open_and_wait(sel, "/admin/")
         self.click_and_wait(sel, "edit_" + old_url)
-        self.set_page_values_and_submit(sel, new_url, new_title, new_body)
+        self.set_page_values_and_submit(sel, new_url, new_title, new_body, sitemap)
 
-    def create_new_page(self, sel, url, title, body):
+    def create_new_page(self, sel, url, title, body, sitemap=0):
         self.open_and_wait(sel, "/admin/pages.html")       
         self.click_and_wait(sel, "link=add a new page")
-        self.set_page_values_and_submit(sel, url, title, body)
+        self.set_page_values_and_submit(sel, url, title, body, sitemap)
 
     def login(self, sel):
         self.open_and_wait(sel, "/admin/")
