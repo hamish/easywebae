@@ -21,9 +21,8 @@ class EasywebTests(unittest.TestCase):
         current_time = self.get_time()
         
         self.login(sel)
-        sel.type("anylitics_id", "")
-        self.click_and_wait(sel,"Save")
         
+        self.set_anylitics_id(sel, "")
 
         url = "/test_%s" % current_time
         title = "Title For Page %s" % current_time
@@ -37,9 +36,7 @@ class EasywebTests(unittest.TestCase):
         self.assert_src_does_not_contain_element(sel, marker)        
         
         anylitics_id="UA-4796991-1"
-        self.open_and_wait(sel, "/admin/")
-        sel.type("anylitics_id", anylitics_id)
-        self.click_and_wait(sel,"Save")
+        self.set_anylitics_id(sel, anylitics_id)
 
 
         # Admin user logged in - tracking should not be present, edit link should
@@ -106,7 +103,7 @@ class EasywebTests(unittest.TestCase):
         self.validate_and_type(sel, "//form[@name='page_content']//input[@name='url']", url)
         self.validate_and_type(sel, "//form[@name='page_content']//input[@name='title']", title)
         self.setRichTextContent(sel, body)
-        self.click_and_wait(sel, "//form[@name='page_content']//input[@name='Save']")
+        self.click_and_wait(sel, "//form[@name='page_content']//button[@name='Save']")
 
     def assert_error_page(self, sel, url):
         self.open_and_wait(sel, url)
@@ -118,8 +115,8 @@ class EasywebTests(unittest.TestCase):
         self.set_page_values_and_submit(sel, new_url, new_title, new_body)
 
     def create_new_page(self, sel, url, title, body):
-        self.open_and_wait(sel, "/admin/")       
-        self.click_and_wait(sel, "new")
+        self.open_and_wait(sel, "/admin/pages.html")       
+        self.click_and_wait(sel, "link=add a new page")
         self.set_page_values_and_submit(sel, url, title, body)
 
     def login(self, sel):
@@ -130,6 +127,12 @@ class EasywebTests(unittest.TestCase):
     def logout(self, sel):
         self.open_and_wait(sel, "/admin/")
         self.click_and_wait(sel, "logout")
+
+    def set_anylitics_id(self, sel, anylitics_id):
+        self.open_and_wait(sel, "/admin/preferences.html")
+        sel.type("anylitics_id", anylitics_id)
+        self.click_and_wait(sel,"Save")
+
 
     def open_and_wait(self, sel, url):
         sel.open(url)

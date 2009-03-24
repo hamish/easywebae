@@ -57,7 +57,7 @@
 						<td><select name="include_in_sitemap"">
 							<option value="true">Yes</option>
 							<option value="false"{% if not page.include_in_sitemap and page.key %} selected="selected"{% endif %}>No</option></select></td>
-						<td class="action"><button type="submit"
+						<td class="action"><button type="submit" name="Save"
 							onmouseover="dojo.addClass(this.parentNode, 'active')"
 							onmouseout="dojo.removeClass(this.parentNode, 'active')">save</button></td>
 						<td class="action" title="Cancel - your changes will not be saved"><a href="/admin/pages.html"
