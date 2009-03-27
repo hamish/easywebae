@@ -134,6 +134,7 @@ class PreferencesHandler(webapp.RequestHandler):
         preferences = Preferences()
     preferences.anylitics_id = self.request.get('anylitics_id')
     preferences.paypal_id = self.request.get('paypal_id')
+    preferences.paypal_sandbox_id = self.request.get('paypal_sandbox_id')
     
     preferences.put()
     self.redirect('/admin/preferences.html')

@@ -11,6 +11,7 @@ class Page(db.Model):
 class Preferences(db.Model):
     anylitics_id = db.StringProperty()
     paypal_id = db.StringProperty()
+    paypal_sandbox_id = db.StringProperty()
 
 class Product(db.Model):
     name = db.StringProperty()

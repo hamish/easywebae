@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Templates imagesBasePath="/images/templates/">
+
+  {% if not preferences.paypal_id and not preferences.paypal_id %}
+  <Template title="Paypal ID not set" image="template1.gif">
+    <Description>The Paypal Id must be set in the website preferences before the buy now preferences are available</Description>
+    <Html>
+      <![CDATA[
+      <p>Paypal Id not set</p>
+      ]]>
+    </Html>
+  </Template>
+  {% endif %}
+  
 {% for product in products %}
+  {% if preferences.paypal_id %}
   <Template title="Buy Now Button" image="template1.gif">
     <Description>Buy now button for {{product.name}} (${{product.price}})</Description>
     <Html>
@@ -13,19 +26,21 @@
       ]]>
     </Html>
   </Template>
+  {% endif %}
 
-
+  {% if preferences.paypal_sandbox_id %}
   <Template title="Buy Now Button (Developers Sandbox)" image="template1.gif">
     <Description>Sandbox Buy now button for {{product.name}} (${{product.price}})</Description>
     <Html>
       <![CDATA[
 			<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
-			<input type="hidden" name="business" value="hcurri_1234182723_biz@gmail.com">
+			<input type="hidden" name="business" value="{{preferences.paypal_id}}">
 			{% include "fcktemplate_common_values.html" %}
 			<br />(Sandbox)
 			</form>
       ]]>
     </Html>
   </Template>
+  {% endif %}
 {% endfor %}
 </Templates>
