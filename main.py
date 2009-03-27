@@ -310,7 +310,7 @@ def dict_to_string(dict):
 
 def main():
   application = webapp.WSGIApplication([('/admin/[a-z]*.html', AdminHandler),
-                                        ('/admin/', AdminRedirector),
+                                        ('/admin/?', AdminRedirector),
                                         ('/admin/save/', SaveHandler),
                                         ('/admin/savePreferences/', PreferencesHandler),
                                         ('/admin/saveProduct/', ProductHandler),
