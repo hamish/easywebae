@@ -18,13 +18,18 @@
 					<tr>
 						<td>Anylitics ID:</td>
 						<td><input class="anyliticsid" type="text" name="anylitics_id" value="{{preferences.anylitics_id}}" /></td>
-						<td rowspan="3" class="action"><button type="submit" name="Save"
+						<td rowspan="4" class="action"><button type="submit" name="Save"
 							onmouseover="dojo.addClass(this.parentNode, 'active')"
 							onmouseout="dojo.removeClass(this.parentNode, 'active')">Save Changes</button></td>
 					</tr>
 					<tr>
 						<td>Paypal ID:</td>
 						<td><input class="paypalid" type="text" name="paypal_id" value="{{preferences.paypal_id}}" /></td>
+
+					</tr>
+					<tr>
+						<td>Administrator Email:</td>
+						<td><input class="admin_email" type="text" name="admin_email" value="{{preferences.admin_email}}" /></td>
 
 					</tr>
 					<tr>

@@ -19,7 +19,9 @@ from google.appengine.api import urlfetch
 from google.appengine.api import mail
 
 from easywebmodels import *
-    
+ 
+class StandardPageHandler(webapp.RequestHandler):
+    pass
 class DownloadHandler(webapp.RequestHandler):
     def get(self):
         url = self.request.path
@@ -135,6 +137,7 @@ class PreferencesHandler(webapp.RequestHandler):
     preferences.anylitics_id = self.request.get('anylitics_id')
     preferences.paypal_id = self.request.get('paypal_id')
     preferences.paypal_sandbox_id = self.request.get('paypal_sandbox_id')
+    preferences.admin_email = self.request.get('admin_email')
     
     preferences.put()
     self.redirect('/admin/preferences.html')
@@ -150,8 +153,8 @@ class ProductHandler(webapp.RequestHandler):
         product.file_ext=self.request.get('product_file_ext')
         #product.file_name=self.request.POST[u'product_file_upload'].filename
         my_content=self.request.get("product_file_upload")
-        product.file_content=db.Blob(my_content)    
-        product.put()
+        product.file_content=db.Blob(my_content)
+        product.put()        
         self.redirect('/admin/book.html')
 
 class EditHandler(webapp.RequestHandler):
@@ -221,7 +224,7 @@ class PaypalIPNHandler(webapp.RequestHandler):
         data['ipn+post+result'] = result
         ipn_verified =  (result == 'VERIFIED')
 
-        product_key = self.request.get('item_number')
+        product_key = self.request.get('custom')
         product = db.get(db.Key(product_key))
         
         paypal_price = self.request.get('mc_gross')
@@ -238,14 +241,14 @@ class PaypalIPNHandler(webapp.RequestHandler):
         payment.payer_email = self.request.get('payer_email')
         payment.txn_id = self.request.get('txn_id')
         payment.item_name = self.request.get('item_name')
-        payment.product_key = self.request.get('item_number')
-        payment.mc_gross = self.request.get('mc_gross')
+        payment.product_key = product_key
+        payment.mc_gross = paypal_price
         
         payment.verification_url = verification_url
         if verified:
             payment.verification_result = "Success"
         else:
-            payment.verification_result = "Failure"
+            paymecomnt.verification_result = "Failure"
         payment.all_values = dict_to_string(data)
         payment.put()
 
@@ -277,7 +280,7 @@ class PaypalIPNHandler(webapp.RequestHandler):
             subject = "Verification Failure"
             path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'purchase_validation_error_email.html')
             body = template.render(path, template_values)
-        message = mail.EmailMessage(sender=sender, subject=subject, to = to, body = body)
+        message = mail.EmailMessage(sender=sender, subject=subject, to=to, body=body, )
         message.send()            
         
         self.response.out.write('processing complete')

@@ -34,7 +34,7 @@
     <Html>
       <![CDATA[
 			<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
-			<input type="hidden" name="business" value="{{preferences.paypal_id}}">
+			<input type="hidden" name="business" value="{{preferences.paypal_sandbox_id}}">
 			{% include "fcktemplate_common_values.html" %}
 			<br />(Sandbox)
 			</form>
