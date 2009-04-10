@@ -84,6 +84,7 @@ class AdminHandler(webapp.RequestHandler):
               'payments' : payments,
               'preferences' : preference_list.get(),
               'logout_url': users.create_logout_url("/"),
+              'template_name': template_name,
               }
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', template_name)
     self.response.out.write(template.render(path, values))
@@ -144,18 +145,46 @@ class PreferencesHandler(webapp.RequestHandler):
     
 class ProductHandler(webapp.RequestHandler):
     def post(self):
+        key_name = self.request.get('key')
         product = Product()
+        if (key_name):
+            product= db.get(db.Key(key_name))
         product.name=self.request.get('product_name')
         product.price=self.request.get('product_price')
         product.return_url=self.request.get('product_return_url')
         product.return_cancel_url = self.request.get('product_return_cancel_url')
-        product.file_name=self.request.get('product_file_name')
-        product.file_ext=self.request.get('product_file_ext')
-        #product.file_name=self.request.POST[u'product_file_upload'].filename
-        my_content=self.request.get("product_file_upload")
-        product.file_content=db.Blob(my_content)
+        product.sucess_email_subject = self.request.get('sucess_email_subject')
+        product.sucess_email_body = self.request.get('sucess_email_body')
+        file_name = self.request.get('product_file_name')
+        if file_name:
+            product.file_name=file_name
+            product.file_ext=self.request.get('product_file_ext')
+            #product.file_name=self.request.POST[u'product_file_upload'].filename
+            my_content=self.request.get("product_file_upload")
+            product.file_content=db.Blob(my_content)
+        else:
+            logging.info("file not set - ignoring")
         product.put()        
         self.redirect('/admin/book.html')
+        
+class EditProductHandler(webapp.RequestHandler):
+  def get(self):
+    key_name = self.request.get('key')
+    product={}
+    if (key_name):
+        product= db.get(db.Key(key_name))
+    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+    pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
+    products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
+    payments=db.GqlQuery("SELECT * FROM Payment ORDER BY creation_date")
+    values = {
+              'pages' : pages,
+              'preferences' : preference_list.get(),
+              'logout_url': users.create_logout_url("/"),
+              'product' : product,
+              }
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'edit_product.html')
+    self.response.out.write(template.render(path, values))
 
 class EditHandler(webapp.RequestHandler):
   def get(self):
@@ -182,23 +211,6 @@ class AdminRedirector(webapp.RequestHandler):
     def get(self):
         self.redirect('/admin/pages.html')
 
-class FakePaymentHandler(webapp.RequestHandler):
-    def post(self):
-        payment = Payment()       
-        payment.first_name = self.request.get('first_name')
-        payment.last_name = self.request.get('last_name')
-        payment.payer_email = self.request.get('payer_email')
-        payment.txn_id = self.request.get('txn_id')
-        payment.item_name = self.request.get('item_name')
-
-        payment.product_key = self.request.get('product_key')
-        payment.mc_gross = self.request.get('mc_gross')
-        
-        payment.verification_url = "fake"
-        payment.verification_result = self.request.get('verification_result')
-        payment.all_values = self.request.get('all_values')
-        payment.put()    
-        self.redirect('/admin/purchases.html')
         
 class PaypalIPNHandler(webapp.RequestHandler):
     live_url = "https://www.paypal.com/cgi-bin/webscr"
@@ -211,27 +223,45 @@ class PaypalIPNHandler(webapp.RequestHandler):
         data['verification+url'] = verification_url   
         return verification_url
 
-    def post(self):
-        self.get()
-    def get(self):
-        data = {}
-        for i in self.request.arguments():
-            data[i] = self.request.get(i)
+    def is_price_valid(self, data, product):
+        paypal_price = self.request.get('mc_gross')
+        product_price = product.price
+        data['paypal+price'] =  paypal_price
+        data['product+price'] = product_price
+        price_verified = (paypal_price == product_price)    
+        return price_verified
+        
+    def is_ipn_valid(self, data):
         data['cmd'] = '_notify-validate'
             
         verification_url = self.get_verification_url(data)
         result = self.do_post(verification_url, data)
         data['ipn+post+result'] = result
         ipn_verified =  (result == 'VERIFIED')
+        return ipn_verified
+    
+    def post(self):
+        self.get()
+    def get(self):
+        self.process_ipn(1)
+    def process_ipn(self, do_paypal_verification):
+        preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+        preferences = preference_list.get()
+
+        data = {}
+        for i in self.request.arguments():
+            data[i] = self.request.get(i)
 
         product_key = self.request.get('custom')
+        logging.info("key = " + product_key)
         product = db.get(db.Key(product_key))
-        
-        paypal_price = self.request.get('mc_gross')
-        product_price = product.price
-        data['paypal+price'] =  paypal_price
-        data['product+price'] = product_price
-        price_verified = (paypal_price == product_price)
+
+        ipn_verified = (1==1)
+        if do_paypal_verification:
+            ipn_verified = self.is_ipn_valid(data)
+        else:
+            ipn_verified = (self.request.get('paypal_verification') == 'Success')
+        price_verified = self.is_price_valid(data, product)
 
         verified = (ipn_verified and price_verified)
             
@@ -242,13 +272,13 @@ class PaypalIPNHandler(webapp.RequestHandler):
         payment.txn_id = self.request.get('txn_id')
         payment.item_name = self.request.get('item_name')
         payment.product_key = product_key
-        payment.mc_gross = paypal_price
+        payment.mc_gross = self.request.get('mc_gross')
         
-        payment.verification_url = verification_url
+        payment.verification_url = self.get_verification_url(data)
         if verified:
             payment.verification_result = "Success"
         else:
-            paymecomnt.verification_result = "Failure"
+            payment.verification_result = "Failure"
         payment.all_values = dict_to_string(data)
         payment.put()
 
@@ -267,14 +297,16 @@ class PaypalIPNHandler(webapp.RequestHandler):
 
         subject=''
         body=''
-        sender='hcurrie@gmail.com'
-        to = 'hcurrie@gmail.com'
+        sender = preferences.admin_email
+        to = preferences.admin_email
+        link_token = '<img src="/static/admin/images/insert_link_here.png" alt="" />'
+        link= "%s/download/%s/%s" %( domain, payment.key(), product.file_name)
         if verified:
             # send email to user
-            subject = "Verification Success"
-            path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'purchase_complete_email.html')
-            body = template.render(path, template_values)
-            #to = payment.payer_email
+            subject = product.sucess_email_subject
+            tmp_body=product.sucess_email_body            
+            body = tmp_body.replace(link_token, link)
+            to = payment.payer_email
         else:
             # send email to admin
             subject = "Verification Failure"
@@ -304,6 +336,11 @@ class PaypalIPNHandler(webapp.RequestHandler):
         r = {'post_result': result }
         r.update(data)
         return  result == 'VERIFIED'
+
+class FakePaymentHandler(PaypalIPNHandler):
+    def post(self):
+        self.process_ipn(0)
+        self.redirect('/admin/purchases.html')
     
 def dict_to_string(dict):
     s=""
@@ -317,6 +354,7 @@ def main():
                                         ('/admin/save/', SaveHandler),
                                         ('/admin/savePreferences/', PreferencesHandler),
                                         ('/admin/saveProduct/', ProductHandler),
+                                        ('/admin/editProduct/', EditProductHandler),
                                         ('/admin/savePayment/', FakePaymentHandler),
                                         ('/admin/new/', EditHandler),
                                         ('/admin/edit/', EditHandler),

@@ -5,12 +5,11 @@
 
 		{% include "head.html" %}
 		{% include "rich_text_editor_head.html" %}
-		
+
 		<script type="text/javascript">
 			function validateForm(form) {
 				// make sure EVERY field is validated before we return
-				var isValid = validateFileUpload(form["product_file_upload"]);
-				isValid = validateURL(form["product_return_cancel_url"],  "Cancel URL") && isValid;
+				var isValid = validateURL(form["product_return_cancel_url"],  "Cancel URL");
 				isValid = validateURL(form["product_return_url"], "Return URL") && isValid;
 				isValid = validatePrice(form["product_price"]) && isValid;
 				isValid = validateName(form["product_name"]) && isValid;
@@ -80,7 +79,7 @@
 		<div class="content">
 			<h1>The Book</h1>
 			
-			<form onsubmit="return validateForm(this)" enctype="multipart/form-data" id="new_product" name="new_product" action="saveProduct/" method="POST">
+			<form onsubmit="return validateForm(this)" enctype="multipart/form-data" id="new_product" name="new_product" action="/admin/saveProduct/" method="POST">
 			<table cellspacing="0" cellpadding="0">
 				<tr>
 					<th>Name</th>
@@ -98,37 +97,36 @@
 					<td><a href="{{product.return_url}}">{{product.return_url}}</a></td>
 					<td><a href="{{product.return_cancel_url}}">{{product.return_cancel_url}}</a></td>
 					<td>{{product.file_name}}</td>
-					<td class="action"><a href="/admin/editProduct/?key={{product.key}}"
-							onmouseover="dojo.addClass(this.parentNode, 'active')"
-							onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</a></td>
-
+					<th>&nbsp;</th>
 				</tr>
 				{% endfor %}
 				
 					<tr class="new">
-						<td><input class="name" type="text" name="product_name" /></td>
-						<td>$<input class="price" type="text" id="product_price" name="product_price" onchange="validatePrice(this)" /></td>
+						<td><input class="name" type="text" name="product_name" value="{{product.name}}"/></td>
+						<td>$<input class="price" type="text" id="product_price" name="product_price" onchange="validatePrice(this)" value="{{product.price}}" /></td>
 						<td><select id="product_return_url" name="product_return_url">
 							<option value="">please select</option>
 							{% for page in pages %}
-							<option>{{page.url}}</option>
+							<option value="{{page.url}}" {% ifequal product.return_url page.url %}SELECTED{% endifequal %} >{{page.url}}</option>
 							{% endfor %}
 							</select></td>
 						<td><select id="product_return_cancel_url" name="product_return_cancel_url">
 							<option value="">please select</option>
 							{% for page in pages %}
-							<option>{{page.url}}</option>
+							<option value="{{page.url}}" {% ifequal product.return_cancel_url page.url %}SELECTED{% endifequal %} >{{page.url}}</option>
 							{% endfor %}
 							</select></td>
-						<td><input type="file" id="product_file_upload"name="product_file_upload" onchange="SplitFile();"/></td>
+						<td>{{product.file_name}}<br /><input type="file" id="product_file_upload"name="product_file_upload" onchange="SplitFile();"/></td>
 						<td class="action"><button type="submit"
 							onmouseover="dojo.addClass(this.parentNode, 'active')"
-							onmouseout="dojo.removeClass(this.parentNode, 'active')">add</button></td>
+							onmouseout="dojo.removeClass(this.parentNode, 'active')">save</button></td>
 					</tr>
 			</table>
-			Subject: <input  type="text" name="sucess_email_subject" /><br />
-			Body: <textarea id="rich_text" name="sucess_email_body" rows="20" cols="40">{{product.sucess_email_body|escape}}</textarea>
-			
+			Subject: <input  type="text" name="sucess_email_subject" {% if product.sucess_email_subject %}value="{{product.sucess_email_subject}}"{% endif %}/><br />
+			Body: <textarea id="rich_text" name="sucess_email_body" rows="20" cols="40">{% if product.sucess_email_body %}{{product.sucess_email_body|escape}}{% endif %}</textarea>
+
+				<input type="hidden" id="key"  name="key" value="{{product.key}}" /> 
+				
 				<input type="hidden" id="product_file_name"  name="product_file_name" value="" /> 
 				<input type="hidden" id="product_file_ext"  name="product_file_ext" value="" /> 
 			</form>

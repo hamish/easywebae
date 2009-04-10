@@ -22,6 +22,8 @@ class Product(db.Model):
     file_name = db.StringProperty()
     file_ext = db.StringProperty()
     file_content = db.BlobProperty()
+    sucess_email_subject = db.StringProperty()
+    sucess_email_body = db.TextProperty()
 
 class Payment(db.Model):
     first_name = db.StringProperty()

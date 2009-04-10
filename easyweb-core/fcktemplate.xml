@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Templates imagesBasePath="/images/templates/">
-
-  {% if not preferences.paypal_id and not preferences.paypal_id %}
+  {% if not preferences.admin_email %}
+  <Template title="Admin Email not set" image="template1.gif">
+    <Description>The Administrator email must be set in the website preferences before the buy now buttons are available</Description>
+    <Html>
+      <![CDATA[
+      <p>Paypal Id not set</p>
+      ]]>
+    </Html>
+  </Template>
+  {% endif %}
+  
+  {% if not preferences.paypal_id and not preferences.paypal_sandbox_id %}
   <Template title="Paypal ID not set" image="template1.gif">
-    <Description>The Paypal Id must be set in the website preferences before the buy now preferences are available</Description>
+    <Description>The Paypal Id must be set in the website preferences before the buy now buttons are available</Description>
     <Html>
       <![CDATA[
       <p>Paypal Id not set</p>
@@ -13,7 +23,7 @@
   {% endif %}
   
 {% for product in products %}
-  {% if preferences.paypal_id %}
+  {% if preferences.paypal_id and preferences.admin_email %}
   <Template title="Buy Now Button" image="template1.gif">
     <Description>Buy now button for {{product.name}} (${{product.price}})</Description>
     <Html>
@@ -28,7 +38,7 @@
   </Template>
   {% endif %}
 
-  {% if preferences.paypal_sandbox_id %}
+  {% if preferences.paypal_sandbox_id and preferences.admin_email %}
   <Template title="Buy Now Button (Developers Sandbox)" image="template1.gif">
     <Description>Sandbox Buy now button for {{product.name}} (${{product.price}})</Description>
     <Html>
@@ -43,4 +53,14 @@
   </Template>
   {% endif %}
 {% endfor %}
+
+  <Template title="insert link here" image="template1.gif">
+    <Description>Insert Link there</Description>
+    <Html>
+      <![CDATA[
+        <img src="/static/admin/images/insert_link_here.png" />
+      ]]>
+    </Html>
+  </Template>
+
 </Templates>
