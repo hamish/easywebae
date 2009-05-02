@@ -5,141 +5,155 @@
 
 		{% include "head.html" %}
 		{% include "rich_text_editor_head.html" %}
+
+        <script type="text/javascript" src="/static/admin/js/form.js"></script>
 		
 		<script type="text/javascript">
-			function validateForm(form) {
-				// make sure EVERY field is validated before we return
-				var isValid = validateFileUpload(form["product_file_upload"]);
-				isValid = validateURL(form["product_return_cancel_url"],  "Cancel URL") && isValid;
-				isValid = validateURL(form["product_return_url"], "Return URL") && isValid;
-				isValid = validatePrice(form["product_price"]) && isValid;
-				isValid = validateName(form["product_name"]) && isValid;
-				
-				return isValid;
-			}
-			
-			function validateName(input) {
-				if (input.value == "") {
-					dojo.byId(input.name + "Error").innerHTML = "Please enter a name";
-					input.focus();
-					return false;
-				}
-				
-				// clear the error message
-				dojo.byId(input.name + "Error").innerHTML = "";
-				return true;
-			}
-			
-			function validateURL(select, fieldTitle) {
-				if (select.value == "") {
-					dojo.byId(select.name + "Error").innerHTML = "Please choose a " + fieldTitle;
-					select.focus();
-					return false;
-				}
-				
-				// clear the error message
-				dojo.byId(select.name + "Error").innerHTML = "";
-				return true;
-			}
-			
-			function validatePrice(input) {
-				// if price contains only digits, we add ".00" to the end of it
-				if (input.value.match(/^\d+$/)) {
-					input.value += ".00";
-				}
-				// if it's not valid show error message
-				else if (!input.value.match(/^\d+\.+\d{2}$/)) {
-					dojo.byId(input.name + "Error").innerHTML =
-						"The price you entered is invalid - please enter only digits and a decimal point. For example <strong>40.00</strong>";
-					input.focus();
-					return false;
-				}
-				
-				// clear the error message
-				dojo.byId(input.name + "Error").innerHTML = "";
-				return true;
-			}
-			
-			function validateFileUpload(upload) {
-				if (upload.value == "") {
-					dojo.byId(upload.name + "Error").innerHTML = "Please choose a file to upload";
-					upload.focus;
-					return false;
-				}
-				
-				// clear the error message
-				dojo.byId(upload.name + "Error").innerHTML = "";
-				return true;
-			}
-		</script>
+            function SplitFile() {
+                var file = document.getElementById("product_file_upload").value;
+                file = file.replace(/\\/g, "/");
+                var parts = file.split("/");
+                var filename = parts[parts.length - 1];
+
+                var bits = filename.split(".");
+                var ext = bits[bits.length - 1];
+
+                document.getElementById("product_file_name").value = filename;
+                document.getElementById("product_file_ext").value = ext.toLowerCase();
+            }
+
+            function checkDecimalPlace(field) {
+                field.value.trim;
+                // if price contains only digits, we add ".00" to the end of it
+                if (field.value.match(/^\d+$/)) {
+                    field.value += ".00";
+                    return true;
+                }
+            }
+        </script>
 	</head>
 	<body>	
 
 		{% include "menu.html" %}
 		
 		<div class="content">
-			<h1>The Book</h1>
-			
-			<form onsubmit="return validateForm(this)" enctype="multipart/form-data" id="new_product" name="new_product" action="saveProduct/" method="POST">
-			<table cellspacing="0" cellpadding="0">
-				<tr>
-					<th>Name</th>
-					<th>Price</th>
-					<th>Successful Purchase Page</th>
-					<th>Failed Purchase Page</th>
-					<th>File</th>
-					<th>&nbsp;</th>
-				</tr>
-				
-				{% for product in products %}
-				<tr>
-					<td>{{product.name}}</td>
-					<td>${{product.price}}</td>
-					<td><a href="{{product.return_url}}">{{product.return_url}}</a></td>
-					<td><a href="{{product.return_cancel_url}}">{{product.return_cancel_url}}</a></td>
-					<td>{{product.file_name}}</td>
-					<td class="action"><a href="/admin/editProduct/?key={{product.key}}"
-							onmouseover="dojo.addClass(this.parentNode, 'active')"
-							onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</a></td>
+			<h1>Ebook</h1>
 
-				</tr>
-				{% endfor %}
-				
-					<tr class="new">
-						<td><input class="name" type="text" name="product_name" /></td>
-						<td>$<input class="price" type="text" id="product_price" name="product_price" onchange="validatePrice(this)" /></td>
-						<td><select id="product_return_url" name="product_return_url">
-							<option value="">please select</option>
-							{% for page in pages %}
-							<option>{{page.url}}</option>
-							{% endfor %}
-							</select></td>
-						<td><select id="product_return_cancel_url" name="product_return_cancel_url">
-							<option value="">please select</option>
-							{% for page in pages %}
-							<option>{{page.url}}</option>
-							{% endfor %}
-							</select></td>
-						<td><input type="file" id="product_file_upload"name="product_file_upload" onchange="SplitFile();"/></td>
-						<td class="action"><button type="submit"
-							onmouseover="dojo.addClass(this.parentNode, 'active')"
-							onmouseout="dojo.removeClass(this.parentNode, 'active')">add</button></td>
-					</tr>
-			</table>
-			Subject: <input  type="text" name="sucess_email_subject" /><br />
-			Body: <textarea id="rich_text" name="sucess_email_body" rows="20" cols="40">{{product.sucess_email_body|escape}}</textarea>
+            <form onsubmit="return validateAll()" enctype="multipart/form-data" id="new_product" name="new_product" action="saveProduct/" method="POST">
+                <input type="hidden" id="product_file_name"  name="product_file_name" value="" />
+                <input type="hidden" id="product_file_ext"  name="product_file_ext" value="" />
+
+
+                <table cellspacing="0" cellpadding="0">
+                    {% for product in products %}
+					{% if forloop.first %}
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Successful Purchase Page</th>
+                        <th>Failed Purchase Page</th>
+                        <th>File</th>
+                        <th>&nbsp;</th>
+                    </tr>
+					{% endif %}
+
+                    <tr>
+                        <td>{{product.name}}</td>
+                        <td class="nowrap">${{product.price}}</td>
+                        <td><a href="{{product.return_url}}">{{product.return_url}}</a></td>
+                        <td><a href="{{product.return_cancel_url}}">{{product.return_cancel_url}}</a></td>
+                        <td>{{product.file_name}}</td>
+                        <td class="action"><a href="/admin/editProduct/?key={{product.key}}"
+                                onmouseover="dojo.addClass(this.parentNode, 'active')"
+                                onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</a></td>
+
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <h2>Your Ebook</h2>
+
+                <table cellspacing="0" cellpadding="0" class="hasHTMLeditor">
+                    <tr class="highlightable">
+                        <th>Ebook File:</th>
+                        <td><input type="file" id="product_file_upload"
+                                   name="product_file_upload"
+                                   class="file" onchange="SplitFile();"/></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">Upload your ebook</td>
+                    </tr>
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>Name:</th>
+                        <td><input class="name validate" type="text" name="product_name" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">This is the name of your ebook</td>
+                        <td name="comment" class="error hidden">Please enter a name for your ebook</td>
+                    </tr>
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>Price:</th>
+                        <td class="nowrap">$<input class="price validate" class="price validate"
+                                                   type="text" onchange="checkDecimalPlace(this)"
+                                                   id="product_price" name="product_price" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">Please enter the price of your ebook - eg <i>30.00</i></td>
+                        <td name="comment" class="error hidden">Please enter only digits and a decimal point, <b>no spaces</b> - eg <i>30.00</i></td>
+                    </tr>
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>Successful Purchase:</th>
+                        <td><select id="product_return_url" name="product_return_url" class="dropdown validate">
+                                <option value="">please select</option>
+                                {% for page in pages %}
+                                <option>{{page.url}}</option>
+                                {% endfor %}
+                                </select></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">This is the page your customers will see after a successful purchase</td>
+                        <td name="comment" class="error hidden">Please choose which page your customers will see after a successful purchase</td>
+                    </tr>
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>Failed Purchase:</th>
+                        <td><select id="product_return_cancel_url" name="product_return_cancel_url" class="dropdown validate">
+                                <option value="">please select</option>
+                                {% for page in pages %}
+                                <option>{{page.url}}</option>
+                                {% endfor %}
+                                </select></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">This is the page your customers will see if there is a problem with their purchase</td>
+                        <td name="comment" class="error hidden">Please choose which page your customers will see if there is a problem with their purchase</td>
+                    </tr>
+                </table>
+
+                <h2>Email for successful customers</h2>
+
+                <table cellspacing="0" cellpadding="0" class="hasHTMLeditor">
+                    <tr class="highlightable">
+                        <th>Subject:</th>
+                        <td><input  type="text" name="sucess_email_subject" class="subject" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">This is the subject line of the email</td>
+                    </tr>
+                </table>
+
+                <p class="HTMLeditor"><textarea id="rich_text" name="sucess_email_body" rows="20" cols="40">{{product.sucess_email_body|escape}}</textarea></p>
 			
-				<input type="hidden" id="product_file_name"  name="product_file_name" value="" /> 
-				<input type="hidden" id="product_file_ext"  name="product_file_ext" value="" /> 
+                <table cellpadding="0" cellspacing="0" class="hasHTMLeditor">
+                    <tr class="new">
+                        <td name="submit" class="action"
+                            onclick="submitForm(dojo.byId('new_product'))"
+							onmouseover="dojo.addClass(this, 'active')"
+							onmouseout="dojo.removeClass(this, 'active')">save all</td>
+                        <td name="submit" class="cancel hidden"
+                            onclick="submitForm(dojo.byId('new_product'))">Please complete required fields to continue</td>
+                        <td class="action cancel" style="width:20px"
+                            title="Cancel - your changes will not be saved"
+                            onclick="document.location='/admin/pages.html'"
+							onmouseover="dojo.addClass(this, 'activecancel')"
+							onmouseout="dojo.removeClass(this, 'activecancel')">X</td>
+					</tr>
+			    </table>
 			</form>
 				
-			<ul class="error">
-				<li id="product_nameError"></li>
-				<li id="product_priceError"></li>
-				<li id="product_return_urlError"></li>
-				<li id="product_return_cancel_urlError"></li>
-				<li id="product_file_uploadError"></li>
-			</ul>
 		</div>
 	</body>
 </html>

@@ -8,30 +8,33 @@
 		{% include "head.html" %}
 		{% include "rich_text_editor_head.html" %}
 
+        <script type="text/javascript" src="/static/admin/js/form.js"></script>
+
 		<script type="text/javascript">
-			function validateForm(form) {
-				// make sure EVERY field is validated before we return
-				var isValid = validateInput(form["title"], "title");
-				isValid = validateInput(form["url"], "URL", "/") && isValid;
-				
-				return isValid;
-			}
-			
-			function validateInput(input, title, startChar) {
-				if (input.value == "") {
-					dojo.byId(input.name + "Error").innerHTML = "Please enter a " + title;
-					input.focus();
-					return false;
-				}
-				else if (startChar && input.value.substring(0,1) != startChar) {
-					input.value = startChar + input.value;
-				}
-				
-				// clear the error message
-				dojo.byId(input.name + "Error").innerHTML = "";
-				return true;
-			}
-		</script>
+            function setSitemapComment() {
+                var yesText = "A link to this page will be included on <a href='/Sitemap.xml'>your sitemap</a>.";
+                var noText = "This page will <b>not</b> be included on <a href='/Sitemap.xml'>your sitemap</a>.";
+                var sitemapSelect = dojo.byId("include_in_sitemap");
+                var commentCell = dojo.query("[class^=note]", sitemapSelect.parentNode.parentNode)[0];
+
+                if (sitemapSelect.value == "true") {
+                    commentCell.innerHTML = yesText;
+                } else {
+                    commentCell.innerHTML = noText;
+                }
+            }
+
+            dojo.addOnLoad(function () {
+                setSitemapComment();
+            });
+
+            function checkLeadingSlash(field) {
+                // add a leading / if not present
+                if (field.value != "" && field.value.indexOf("/") != 0) {
+                    field.value = "/" + field.value;
+                }
+            }
+        </script>
 		
 	</head>
 	<body>
@@ -41,37 +44,53 @@
 		<div class="content">
 			<h1>{% if page.key %}Edit{% else %}New{% endif %} Page</h1>
 			
-			<form onsubmit="return validateForm(this)" action="/admin/save/" method="POST" name="page_content">
-				<input type="hidden" name="key"  value="{{page.key}}" /> 
-			    <table cellpadding="0" cellspacing="0" style="width:100%;">
-					<tr>
-						<th>URL</th>
-						<th>Title</th>
-						<th>On Sitemap</th>
-						<th>&nbsp;</th>
-						<th>&nbsp;</th>
-					</tr>
-					<tr class="new">
-						<td><input type="text" id="url" name="url" class="url" onchange="validateInput(this, 'url', '/');" value="{{page.url}}" /></td>
-						<td><input type="text" id="title" name="title" class="title" value="{{page.title}}" /></td>
-						<td><select name="include_in_sitemap"">
-							<option value="true">Yes</option>
-							<option value="false"{% if not page.include_in_sitemap and page.key %} selected="selected"{% endif %}>No</option></select></td>
-						<td class="action"><button type="submit" name="Save"
-							onmouseover="dojo.addClass(this.parentNode, 'active')"
-							onmouseout="dojo.removeClass(this.parentNode, 'active')">save</button></td>
-						<td class="action" title="Cancel - your changes will not be saved"><a href="/admin/pages.html"
-							onmouseover="dojo.addClass(this.parentNode, 'activecancel')"
-							onmouseout="dojo.removeClass(this.parentNode, 'activecancel')">X</a></td>
-					</tr>
-					<tr>
-						<th id="urlError" class="error"></th>
-						<th id="titleError" class="error"></th>
-						<th colspan="3"></th>
+			<form id="new_page" action="/admin/save/" method="POST" name="page_content" onsubmit="return validateAll()">
+				<input type="hidden" name="key"  value="{{page.key}}" />
+                
+                <table cellpadding="0" cellspacing="0" class="hasHTMLeditor">
+                    <tr class="highlightable">
+						<th><span class="required">*</span>URL:</th>
+                        <td><input type="text" id="url" name="url" class="url validate" onchange="checkLeadingSlash(this)" value="{{page.url}}" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">URLs cannot contain spaces and must start with &quot;/&quot; - eg <i>/my-page.htm</i></td>
+                        <td name="comment" class="error hidden">Please enter a URL containing only letters, numbers, hyphen, underscore, dot and forward slash with <b>no spaces</b></td>
+                    </tr>
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>Title:</th>
+                        <td><input type="text" id="title" name="title" class="title validate" value="{{page.title}}" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">This will be displayed at the top of the browser window</td>
+                        <td name="comment" class="error hidden">Please enter a title</td>
+                    </tr>
+                    <tr class="highlightable">
+                        <th class="nowrap">Promote this page:</th>
+                        <td><select id="include_in_sitemap" name="include_in_sitemap" onchange="setSitemapComment()">
+                            <option value="true">Yes</option>
+                            <option value="false"{% if not page.include_in_sitemap and page.key %} selected="selected"{% endif %}>No</option></select></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden"></td>
+                    </tr>
+                </table>
+
+                <p class="HTMLeditor"><textarea id="rich_text" name="html" rows="20" cols="40">{{page.html|escape}}</textarea></p>
+
+                <table cellpadding="0" cellspacing="0" class="hasHTMLeditor">
+                    <tr class="new">
+                        <td name="submit" class="action"
+                            onclick="submitForm(dojo.byId('new_page'))"
+							onmouseover="dojo.addClass(this, 'active')"
+							onmouseout="dojo.removeClass(this, 'active')">save</td>
+                        <td name="submit" class="cancel hidden"
+                            onclick="submitForm(dojo.byId('new_page'))">Please complete required fields to continue</td>
+                        <td class="action cancel" style="width:20px"
+                            title="Cancel - your changes will not be saved"
+                            onclick="document.location='/admin/pages.html'"
+							onmouseover="dojo.addClass(this, 'activecancel')"
+							onmouseout="dojo.removeClass(this, 'activecancel')">X</td>
 					</tr>
 			    </table>
 			
-			    <textarea id="rich_text" name="html" rows="20" cols="40">{{page.html|escape}}</textarea>
+
 			</form>
 		</div>
 	</body>
