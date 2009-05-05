@@ -4,7 +4,8 @@
 		<title>easywebAE admin: Website Preferences</title>
 		{% include "head.html" %}
 
-	</head>
+        <script type="text/javascript" src="/static/admin/js/form.js"></script>
+    </head>
 	<body>	
 
 		{% include "menu.html" %}
@@ -13,36 +14,42 @@
 
 			<h1>Website Preferences</h1>
 		
-			<form name="site_preferences" action="savePreferences/" method="POST">
+			<form id="site_preferences" name="site_preferences" action="savePreferences/" onsubmit="return validateAll()" method="POST">
 				<table cellspacing="0" cellpadding="0">
-					<tr>
-						<td>Anylitics ID:</td>
-						<td><input class="anyliticsid" type="text" name="anylitics_id" value="{{preferences.anylitics_id}}" /></td>
-						<td rowspan="4" class="action"><button type="submit" name="Save"
-							onmouseover="dojo.addClass(this.parentNode, 'active')"
-							onmouseout="dojo.removeClass(this.parentNode, 'active')">Save Changes</button></td>
-					</tr>
-					<tr>
-						<td>Paypal ID:</td>
-						<td><input class="paypalid" type="text" name="paypal_id" value="{{preferences.paypal_id}}" /></td>
-
-					</tr>
-					<tr>
-						<td>Administrator Email:</td>
-						<td><input class="admin_email" type="text" name="admin_email" value="{{preferences.admin_email}}" /></td>
-
-					</tr>
-					<tr>
-						<td>Paypal Sandbox ID:</td>
-						<td><input class="paypalid" type="text" name="paypal_sandbox_id" value="{{preferences.paypal_sandbox_id}}" /></td>
-
-					</tr>
-
-				</table>
+					<tr class="highlightable">
+						<th name="name"><span class="required">*</span>Admin Email:</th>
+						<td name="field"><input class="email validate" type="text" name="admin_email"
+                                   value="{{preferences.admin_email}}" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">Enter your current email address</td>
+                        <td name="comment" class="error hidden">Please type your complete email address</td>
+                    </tr>
+                    <tr class="highlightable">
+						<th name="name"><span class="required">*</span>PayPal ID:</th>
+						<td name="field"><input class="email validate" type="text" name="paypal_id"
+                                   value="{{preferences.paypal_id}}" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">You must enter your PayPal ID before you can start selling books</td>
+                        <td name="comment" class="error hidden">Please enter your PayPal ID</td>
+                    </tr>
+                    <tr class="highlightable">
+						<th>Analytics ID:</th>
+						<td><input class="anyliticsid" type="text" name="anylitics_id"
+                                   value="{{preferences.anylitics_id}}" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">You can get an Analytics ID by signing up for <a href="http://www.google.com/analytics/">Google Analytics</a></td>
+                    </tr>
+                    <tr class="new">
+                        <td colspan="2" name="submit" class="action"
+                            onclick="submitForm(dojo.byId('site_preferences'))"
+                            onmouseover="dojo.addClass(this, 'active')"
+                            onmouseout="dojo.removeClass(this, 'active')">Save Changes</td>
+                        <td colspan="2" name="submit" class="cancel hidden"
+                            onclick="submitForm(dojo.byId('site_preferences'))">Please complete required fields to continue</td>
+                        <td class="placeholder">&nbsp;</td>
+                    </tr>
+                </table>
 			</form>
-				
-			<p class="note">Testing Anylitics ID = UA-4796991-1
-				<br />Testing Paypal ID = hcurri_1234182723_biz@gmail.com</p>
 		</div>
 
 		

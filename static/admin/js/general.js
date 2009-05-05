@@ -1,17 +1,3 @@
-function SplitFile()
-{
-    var file = document.getElementById("product_file_upload").value;
-    file = file.replace(/\\/g, "/");
-    var parts = file.split("/");
-    var filename = parts[parts.length - 1];
-    
-    var bits = filename.split(".");
-    var ext = bits[bits.length - 1];
-    
-    document.getElementById("product_file_name").value = filename;    
-    document.getElementById("product_file_ext").value = ext.toLowerCase();
-}
-
 dojo.addOnLoad(function() {
     dojo.byId("topsplash").innerHTML = document.domain;
 

@@ -6,6 +6,15 @@ body {
 	background: #fff;
 }
 
+.hidden {
+    display: none;
+}
+
+span.required {
+    color: #933;
+    font-size: 0.9em;
+}
+
 div.topbit {
 	background: #69c;
 }
@@ -54,6 +63,12 @@ h1 {
 div.topbit h1 {
 	font-size: 2em;
 }
+h2 {
+    color: #2e5c8a;
+    font-size: 1.4em;
+    font-style: italic;
+    font-weight: normal;
+}
 
 /**** content styles ****/
 div.content {
@@ -81,27 +96,41 @@ ul.error li {
 	font-size: 0.9em;
 }
 
+p.HTMLeditor {
+    margin: 0;
+    background: #ECF2F8;
+    border-bottom: 2px solid #fff;
+}
+
 
 /**** table styles ****/
 table {
 	margin: 0;
 }
+table.hasHTMLeditor {
+    width: 100%;
+}
 table th, table td {
 	padding: 1px 8px;
-	line-height: 1.8em;
 	vertical-align: middle;
+    background: #ECF2F8;
+	border-bottom: 3px solid #fff;
 }
 table input, table select, table textarea {
 	font-size: 1em;
 }
-table th {
+table tr th {
+    height: 1.8em;
 	color: #3D7AB8;
 	font-weight: normal;
 	text-align: left;
+    white-space: nowrap;
 }
-table td {
-	background: #ECF2F8;
-	border-bottom: 3px solid #fff;
+table th, table td {
+    line-height: 1.8em;
+}
+table .nowrap {
+    white-space: nowrap;
 }
 table td.action {
 	text-align: center;
@@ -112,67 +141,139 @@ table td.active {
 	background: #3D7AB8;
 }
 table td button {
-	color: #2E5C8A;
+    padding: 3px 0;
+    color: #2E5C8A;
 	font-size: 1em;
-	background: transparent;
+    background: transparent;
 	border: none;
 }
 div table td.active a,
 	div table td.active button {
 	color: #fff;
 }
+div table tr td.placeholder {
+    width: 400px;
+    color: #fff;
+    font-size: 0.9em;
+    line-height: 1.2em;
+    background: transparent;
+}
+div table.hasHTMLeditor tr td.placeholder,
+form table.hasHTMLeditor tr td.note,
+table.hasHTMLeditor tr.problem.highlight td.error {
+    width: 50%;
+}
+div table tr td.placeholder a {
+    color: #fff;
+}
 table tr.new td {
 	background: #F2F8EC;
 }
 table tr.new td.action {
+	color: #206020;
+    cursor: pointer;
 	background: #D9EAC8;
 }
 table tr.new td.active {
-	background: #99CC66;
+    background: #99CC66;
 }
 table tr.new a, table tr.new button {
 	color: #206020;
 }
-table.problem tr th {
-	color: #993333;
+table tr.instruction td {
+    font-size: 0.9em;
+    line-height: 1.3em;
 }
-table.problem tr td {
+table tr.instruction td img {
+    margin-right: 0.5em;
+    border: 0;
+}
+form table tr td.note {
+    color: #fff;
+    background: transparent;
+}
+table tr.highlight th,
+    table tr.highlight td {
+    background: #C0D4E8;
+}
+form table tr td.note {
+    border-left: 3px solid #fff;
+    font-size: 0.9em;
+    line-height: 1em;
+    color: #666;
+	background: #ECF2F8;
+}
+.problem th, .problem td {
+	color: #993333;
 	background: #F8ECEC;
 }
-table.problem tr td.action {
+.problem td.error {
+    font-size: 0.9em;
+    line-height: 1em;
+    border-left: 3px solid #fff;
+}
+.problem td.action {
 	background: #ECC7C6;
 }
-table.problem tr td.active,
+.problem td.active,
 table td.activecancel {
 	background: #CC6666;
 }
-table.problem td a, table.problem td button,
+.problem td a, .problem td button,
 table td.cancel a {
 	color: #993333;
 }
-table tr.new td.cancel {
+table tr.problem.highlight th,
+    table tr.problem.highlight td {
 	background: #ECC7C6;
+}
+table tr.problem.highlight td.error {
+	background: #F8ECEC;
+}
+table tr.problem td input {
+    border: 2px solid #CC6666;
+}
+td.cancel,
+table tr.new td.cancel {
+	color: #993333;
+    text-align: center;
+    cursor: pointer;
+    background: #ECC7C6;
 }
 table tr td.cancel a {
 	color: #993333;
 }
 table tr.new td.activecancel {
-	background: #D27979;
+    cursor: pointer;
+    background: #D27979;
 }
 table tr td.activecancel a {
 	color: #fff;
 }
-table tr.editable td {
+table tr.noborder th,
+    table tr.noborder td {
+    border-width: 0;
+}
+table tr.advanced th,
+    table tr.advanced td {
 	background: #F2E6D9;
 }
-table tr.editable td.action {
+table tr.advanced th {
+    color: #604020;
+}
+table tr.advanced td.action {
 	background: #E2C8AB;
 }
-table tr.editable a, table tr.editable button {
-	color: #604020;
-}
-table tr.editable td.active {
+table tr.advanced td.active {
 	background: #CC9966;
+}
+table tr.advanced.highlight th,
+    table tr.advanced.highlight td {
+	background: #E2C8AB;
+}
+table tr.advanced.highlight td.note {
+    color: #666;
+	background: #F2E6D9;
 }
 table tr.spacer th {
 	line-height: 1em;
@@ -181,10 +282,10 @@ table td.checkbox, table th.checkbox { text-align: center; }
 
 /**** form styles ****/
 input, select { vertical-align: middle; }
-input.url { width: 120px; }
-input.title { width: 300px; }
+input.url { width: 200px; }
+input.title { width: 260px; }
+input.email { width: 220px; }
 input.anyliticsid { width: 180px; }
-input.paypalid { width: 300px; }
 input.name { width: 200px; }
 input.price { width: 50px; }
 
