@@ -10,6 +10,10 @@ handlers:
 - url: /admin/.*
   script: main.py
   login: admin
+
+- url: /ignoreme/.*
+  script: ignoreme.py
+  login: admin
   
 - url: .*
   script: main.py
