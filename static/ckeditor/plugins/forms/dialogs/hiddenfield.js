@@ -1,0 +1,6 @@
+﻿/*
+Copyright (c) 2003-2009, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.html or http://ckeditor.com/license
+*/
+
+CKEDITOR.dialog.add('hiddenfield',function(a){return{title:a.lang.hidden.title,minWidth:400,minHeight:200,onShow:function(){var c=this;c.restoreSelection();var b=c.getParentEditor().getSelection().getSelectedElement();if(b&&b.getName()=='input'&&b.getAttribute('type')=='checkbox'){c._element=b;c.setupContent(b);}},onOk:function(){var e=this;var b,c=e._element,d=!c;if(d){b=e.getParentEditor();c=b.document.createElement('input');c.setAttribute('type','hidden');}e.commitContent(c);if(d){e.restoreSelection();e.clearSavedSelection();b.insertElement(c);}},contents:[{id:'info',label:a.lang.hidden.title,title:a.lang.hidden.title,elements:[{id:'txtName',type:'text',label:a.lang.hidden.name,'default':'',accessKey:'N',setup:function(b){this.setValue(b.getAttribute('name'));this.focus();},commit:function(b){if(this.getValue()!=''||this.isChanged())b.setAttribute('name',this.getValue());}},{id:'txtValue',type:'text',label:a.lang.hidden.value,'default':'',accessKey:'V',setup:function(b){this.setValue(b.getAttribute('value'));},commit:function(b){if(this.getValue()!=''||this.isChanged())b.setAttribute('value',this.getValue());}}]}]};});

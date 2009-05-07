@@ -1,10 +1,34 @@
-		<script type="text/javascript" src="/static/fckeditor/fckeditor.js"></script>
+		<script type="text/javascript" src="/static/ckeditor/ckeditor.js"></script>
 		<script type="text/javascript">
 			window.onload = function()
 			{
-				var oFCKeditor = new FCKeditor( 'rich_text' ) ;
-				oFCKeditor.BasePath = "/static/fckeditor/" ;
-				oFCKeditor.Config["CustomConfigurationsPath"] = "/static/customizations/myconfig.js"  ;
-				oFCKeditor.ReplaceTextarea() ;
-			}
+				//CKEDITOR.replace( 'rich_text' );
+				//CKeditor.BasePath = "/static/fckeditor/" ;
+			    //CKeditor.Config["CustomConfigurationsPath"] = "/static/customizations/myconfig.js"  ;
+				//CKeditor.ReplaceTextarea();
+				// var oCKeditor = CKEDITOR.replace( 'rich_text' ) ;
+				CKEDITOR.replace( 'rich_text', {height : 400, customConfig : '/static/customizations/myconfig.js' } );
+				//alert(getMethods(CKEDITOR).join("\n"));
+				
+				//oCKeditor.BasePath = "/static/ckeditor/" ;
+				//oCKeditor.Config["CustomConfigurationsPath"] = "/static/customizations/myconfig.js"  ;
+				//CKeditor.ReplaceTextarea() ;
+				
+			};
+function getMethods(obj) {
+  var result = [];
+  for (var id in obj) {
+    try {
+      if (typeof(obj[id]) == "function") {
+        result.push(id + ": " + obj[id].toString());
+      }
+    } catch (err) {
+      result.push(id + ": inaccessible");
+    }
+  }
+  return result;
+}
+
 		</script>
+		
+		

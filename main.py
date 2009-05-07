@@ -101,7 +101,7 @@ class TemplateHandler(webapp.RequestHandler):
               'products' : products,
               'preferences' : preference_list.get(),
               }
-    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'fcktemplate.xml')
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'myCKtemplates.js')
     self.response.out.write(template.render(path, values))
 class SitemapHandler(webapp.RequestHandler):
   def get(self):
@@ -361,6 +361,7 @@ def main():
                                         ('/download/.*', DownloadHandler),
                                         ('/Sitemap.xml', SitemapHandler),
                                         ('/fcktemplate.xml', TemplateHandler),
+                                        ('/myCKtemplates.js', TemplateHandler),
                                         ('/purchase/ipn/', PaypalIPNHandler),
                                         ('.*', MainHandler),
                                         ])

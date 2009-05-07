@@ -1,0 +1,6 @@
+﻿/*
+Copyright (c) 2003-2009, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.html or http://ckeditor.com/license
+*/
+
+CKEDITOR.dialog.add('smiley',function(a){var b=a.config,c=b.smiley_images,d=b.smiley_columns,e,f=['<table cellspacing="2" cellpadding="2"><tbody>'];for(e=0;e<c.length;e++){if(e%d===0)f.push('<tr>');f.push('<td class="dark_background hand centered" style="vertical-align: middle;"><img border="0" class="hand" title="',b.smiley_descriptions[e],'" src="',CKEDITOR.tools.htmlEncode(b.smiley_path+c[e]),'"',CKEDITOR.env.ie?" onload=\"this.setAttribute('width', 2); this.removeAttribute('width');\" ":'','></td>');if(e%d==d-1)f.push('</tr>');}if(e<d-1){for(;e<d-1;e++)f.push('<td></td>');f.push('</tr>');}f.push('</tbody></table>');var g={type:'html',html:f.join(''),onClick:function(h){var i=h.data.getTarget(),j=i.getName();if(j=='td')i=i.getChild(0);else if(j!='img')return;this.getDialog().restoreSelection();var k=i.getAttribute('src'),l=i.getAttribute('title'),m=a.document.createElement('img',{attributes:{src:k,_cke_saved_src:k,title:l,alt:l}});a.insertElement(m);this.getDialog().hide();},style:'width: 100%; height: 100%; border-collapse: separate;'};return{title:a.lang.smiley.title,minWidth:320,minHeight:210,contents:[{id:'tab1',label:'',title:'',expand:true,elements:[g]}],buttons:[CKEDITOR.dialog.cancelButton]};});
