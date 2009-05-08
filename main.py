@@ -354,6 +354,7 @@ def main():
                                         ('/admin/save/', SaveHandler),
                                         ('/admin/savePreferences/', PreferencesHandler),
                                         ('/admin/saveProduct/', ProductHandler),
+                                        ('/admin/newProduct/', EditProductHandler),
                                         ('/admin/editProduct/', EditProductHandler),
                                         ('/admin/savePayment/', FakePaymentHandler),
                                         ('/admin/new/', EditHandler),

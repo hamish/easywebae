@@ -129,12 +129,17 @@ table tr th {
 table th, table td {
     line-height: 1.8em;
 }
+table tr a {
+    text-decoration: underline;
+}
 table .nowrap {
     white-space: nowrap;
 }
 table td.action {
+    color: #2E5C8A;
 	text-align: center;
-	background: #C0D4E8;
+    cursor: pointer;
+    background: #C0D4E8;
 	border-left: 1px solid #fff;
 }
 table td.active {
@@ -147,7 +152,8 @@ table td button {
     background: transparent;
 	border: none;
 }
-div table td.active a,
+div table td.active,
+    div table td.active a,
 	div table td.active button {
 	color: #fff;
 }

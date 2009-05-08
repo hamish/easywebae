@@ -28,19 +28,19 @@
 					<td class="url">{{page.url}}</td>
 					<td class="title">{{page.title}}</td>
 					<td class="checkbox">{% if page.include_in_sitemap %}Yes{% else %}No{% endif %}</td>
-					<td class="action"><a href="/admin/edit/?key={{page.key}}" id="edit_{{page.url}}"
-						onmouseover="dojo.addClass(this.parentNode, 'active')"
-						onmouseout="dojo.removeClass(this.parentNode, 'active')">edit</a></td>
-					<td class="action go"><a href="{{page.url}}" id="go_{{page.url}}"
-						onmouseover="dojo.addClass(this.parentNode, 'active')"
-						onmouseout="dojo.removeClass(this.parentNode, 'active')">go</a></td>
+					<td class="action" onclick='document.location="/admin/edit/?key={{page.key}}"' id="edit_{{page.url}}"
+						onmouseover="dojo.addClass(this, 'active')"
+						onmouseout="dojo.removeClass(this, 'active')">edit</td>
+					<td class="action go" onclick='document.location="{{page.url}}"' id="go_{{page.url}}"
+						onmouseover="dojo.addClass(this, 'active')"
+						onmouseout="dojo.removeClass(this, 'active')">go</td>
 				</tr>
 				{% endfor %}
 				
 				<tr class="new">
-					<td colspan="5" class="action"><a href="new/"
-						onmouseover="dojo.addClass(this.parentNode, 'active')"
-						onmouseout="dojo.removeClass(this.parentNode, 'active')">add a new page</a></td>
+					<td colspan="5" class="action" onclick='document.location="/admin/new/"'
+						onmouseover="dojo.addClass(this, 'active')"
+						onmouseout="dojo.removeClass(this, 'active')">add a new page</td>
 				</tr>
 			</table>
 		</div>
