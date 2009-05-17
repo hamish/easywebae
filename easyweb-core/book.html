@@ -4,7 +4,6 @@
 		<title>easywebAE admin: The Book</title>
 
 		{% include "head.html" %}
-		{% include "rich_text_editor_head.html" %}
 
         <script type="text/javascript" src="/static/admin/js/form.js"></script>
 		
@@ -49,6 +48,7 @@
 					{% if forloop.first %}
                     <tr>
                         <th>Name</th>
+                        <th>Purchase URL</th>
                         <th>Price</th>
                         <th>Successful Purchase Page</th>
                         <th>Failed Purchase Page</th>
@@ -59,6 +59,7 @@
 
                     <tr>
                         <td>{{product.name}}</td>
+                        <td><a href="/product/{{product.key.id}}/"> click here</a></td>
                         <td class="nowrap">${{product.price}}</td>
                         <td><a href="{{product.return_url}}">{{product.return_url}}</a></td>
                         <td><a href="{{product.return_cancel_url}}">{{product.return_cancel_url}}</a></td>

@@ -10,6 +10,7 @@ import wsgiref.handlers
 import logging
 import mimetypes
 import urllib
+import email
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
@@ -20,9 +21,60 @@ from google.appengine.api import mail
 
 from easywebmodels import *
  
-class StandardPageHandler(webapp.RequestHandler):
-    pass
+class UserProductHandler(webapp.RequestHandler):
+
+    def redirect_to_product_payment(self, product, domain):
+        preference_list = db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+        preferences = preference_list.get()
+        parameters = {
+                      "business": "%s" % preferences.paypal_id, 
+                      "cmd": "_xclick", 
+                      "item_name": "%s" % product.name, 
+                      "custom": "%s" % product.key, 
+                      "amount": "%s" % product.price, 
+                      "currency_code": "USD", 
+                      "no_shipping": "1", 
+                      "rm": "1", 
+                      "return": "%s%s" % (domain, product.return_url), 
+                      "cancel_return": "%s%s" % (domain, product.return_cancel_url), 
+                      "bn": "Breakup09_BuyNow_WPS_AU", 
+                      "notify_url": "%s%s" % (domain, "/purchase/ipn/")
+        }
+        parameters_encoded = urllib.urlencode(parameters)
+        paypal_url = "https://www.paypal.com/cgi-bin/webscr?"
+        payment_link = paypal_url + parameters_encoded
+        logging.info("redirect to:" + payment_link)
+        self.redirect(payment_link)
+
+    def get(self):
+        domain_url = self.request.url
+        pos = domain_url.find('/', 9) # find the first / after the http:// part
+        domain= domain_url[:pos]     
+           
+        url = self.request.path
+        id=''
+        match = re.match("/product/([0-9]*)/?", url)
+        if match:
+            id=match.groups()[0]
+        if id:
+            key = db.Key.from_path('Product', int(id))
+            logging.info(key)
+            product = db.get(key)
+            if product:
+                self.redirect_to_product_payment(product, domain)
+            else:
+                self.response.out.write ("No corresponding product in database for id: " + id)                
+        else:
+            product_list=db.GqlQuery("SELECT * FROM Product order by creation_date DESC LIMIT 1")
+            product= product_list.get()
+            if product:
+                logging.info("/product/ called with no id - using id: %s" % product.key().id())
+                self.redirect_to_product_payment(product, domain)
+            else:
+                self.response.out.write ("Unable to find the ebook you wish to purchase")
+            
 class DownloadHandler(webapp.RequestHandler):
+    
     def get(self):
         url = self.request.path
         match = re.match("/download/(.*)/", url)
@@ -61,8 +113,10 @@ class MainHandler(webapp.RequestHandler):
               'is_admin': users.is_current_user_admin()
                   }
         path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'content.html')
-        self.response.out.write(template.render(path, values))
-    #self.response.out.write(html)
+        #self.response.out.write(template.render(path, values))
+        if (not url.endswith("/")):
+            self.response.headers['Content-Type'] = mimetypes.guess_type(url)[0]
+        self.response.out.write(html)
 
 class AdminHandler(webapp.RequestHandler):
   def get(self):
@@ -78,7 +132,9 @@ class AdminHandler(webapp.RequestHandler):
     pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
     products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
     payments=db.GqlQuery("SELECT * FROM Payment ORDER BY creation_date")
+#    images=db.GqlQuery("SELECT * FROM Image ORDER BY creation_date")
     values = {
+#              'images' : images,
               'pages' : pages,
               'products' : products,
               'payments' : payments,
@@ -101,7 +157,7 @@ class TemplateHandler(webapp.RequestHandler):
               'products' : products,
               'preferences' : preference_list.get(),
               }
-    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'myCKtemplates.js')
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'fcktemplate.xml')
     self.response.out.write(template.render(path, values))
 class SitemapHandler(webapp.RequestHandler):
   def get(self):
@@ -124,10 +180,52 @@ class SaveHandler(webapp.RequestHandler):
         page= db.get(db.Key(key_name))
     page.url = self.request.get('url')
     page.title = self.request.get('title')
-    page.html = self.request.get('html')
+    page.html = str(self.request.get('html'))
     page.include_in_sitemap =  (self.request.get('include_in_sitemap', 'false') == 'true')
     page.put()
     self.redirect('/admin/pages.html')
+
+class UploadHandler(webapp.RequestHandler):
+
+    def process_mht_file(self, content, file_path):
+        msg = email.message_from_string(content)
+        for part in msg.walk():
+            ct = part.get_content_type()
+            if (ct.startswith("text") or ct.startswith("image")):
+                regex = re.compile("file:///[A-Z]:/[a-zA-Z0-9]*/")
+                file_name = regex.sub( file_path , part.get('Content-Location'))
+                content = part.get_payload(decode=True)
+                if (ct.startswith("text")):
+                    content = regex.sub( file_path , content)
+                page = Page()
+                page.url = file_name
+                page.html = content
+                page.title = "test"
+                page.include_n_sitemap = True
+                page.put()
+            
+            logging.info("part:" + part.get_content_type())
+
+    def post(self):
+        file_path=self.request.get("file_path")        
+        file_name=self.request.get("file_name")
+        content=self.request.get("content")
+        logging.info("upload:" + file_name)
+        
+        # TODO: check if the file is an mht file and do the appropriate thing - otherwise store the file normally. 
+        lower_file_name = file_name.lower()
+        if (lower_file_name.endswith(".mht") or lower_file_name.endswith(".mhtml") ):
+            self.process_mht_file(content, file_path)
+        else:
+            page = Page()
+            page.url = file_path + file_name
+            page.html = content
+            page.title = "test"
+            page.include_n_sitemap = False
+            page.put()
+            
+
+        self.redirect('/admin/pages.html')    
 
 class PreferencesHandler(webapp.RequestHandler):
   def post(self):
@@ -142,7 +240,7 @@ class PreferencesHandler(webapp.RequestHandler):
     
     preferences.put()
     self.redirect('/admin/preferences.html')
-    
+
 class ProductHandler(webapp.RequestHandler):
     def post(self):
         key_name = self.request.get('key')
@@ -364,6 +462,8 @@ def main():
                                         ('/fcktemplate.xml', TemplateHandler),
                                         ('/myCKtemplates.js', TemplateHandler),
                                         ('/purchase/ipn/', PaypalIPNHandler),
+                                        ('/admin/upload/', UploadHandler),
+                                        ('/product/.*', UserProductHandler),
                                         ('.*', MainHandler),
                                         ])
   wsgiref.handlers.CGIHandler().run(application)

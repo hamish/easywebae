@@ -3,8 +3,16 @@ from google.appengine.ext import db
 class Page(db.Model):
     url = db.StringProperty()
     title = db.StringProperty()
-    html = db.TextProperty()
+    #html = db.TextProperty()
+    html = db.BlobProperty()
+    #type = db.StringProperty(required=True, choices=set(["text", "image", "other"]))
     include_in_sitemap = db.BooleanProperty()
+    creation_date = db.DateTimeProperty(auto_now_add=True)
+    modification_date = db.DateTimeProperty(auto_now=True)
+
+class Image(db.Model):
+    file_name = db.StringProperty()
+    content = db.BlobProperty()
     creation_date = db.DateTimeProperty(auto_now_add=True)
     modification_date = db.DateTimeProperty(auto_now=True)
 
@@ -24,6 +32,9 @@ class Product(db.Model):
     file_content = db.BlobProperty()
     sucess_email_subject = db.StringProperty()
     sucess_email_body = db.TextProperty()
+    priority = db.IntegerProperty()
+    creation_date = db.DateTimeProperty(auto_now_add=True)
+    modification_date = db.DateTimeProperty(auto_now=True)
 
 class Payment(db.Model):
     first_name = db.StringProperty()

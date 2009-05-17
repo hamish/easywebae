@@ -43,6 +43,7 @@
 		
 		<div class="content">
 			<h1>{% if page.key %}Edit{% else %}New{% endif %} Page</h1>
+
 			
 			<form id="new_page" action="/admin/save/" method="POST" name="page_content" onsubmit="return validateAll()">
 				<input type="hidden" name="key"  value="{{page.key}}" />
@@ -89,9 +90,9 @@
 							onmouseout="dojo.removeClass(this, 'activecancel')">X</td>
 					</tr>
 			    </table>
-			
 
 			</form>
+
 		</div>
 	</body>
 </head>

@@ -12,6 +12,11 @@ handlers:
   script: main.py
   login: admin
 
+- url: /filemanager/.*
+  script: browse.py
+  #login: admin
+
+
 - url: /ignoreme/.*
   script: ignoreme.py
   login: admin

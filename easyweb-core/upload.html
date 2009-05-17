@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+		<title>easywebAE admin: The Book</title>
+
+		{% include "head.html" %}
+        <script type="text/javascript" src="/static/admin/js/form.js"></script>
+		
+		<script type="text/javascript">
+            function SplitFile() {
+                var file = document.getElementById("content").value;
+                file = file.replace(/\\/g, "/");
+                var parts = file.split("/");
+                var filename = parts[parts.length - 1];
+
+                document.getElementById("file_name").value = filename;
+            }
+
+            function checkDecimalPlace(field) {
+                field.value.trim;
+                // if price contains only digits, we add ".00" to the end of it
+                if (field.value.match(/^\d+$/)) {
+                    field.value += ".00";
+                    return true;
+                }
+            }
+        </script>
+	</head>
+	<body>	
+
+		{% include "menu.html" %}
+		
+		<div class="content">
+			<h1>Upload</h1>
+
+            <form enctype="multipart/form-data" id="new_product" name="upload_file" action="/admin/upload/" method="post">
+                <input type="text" id="file_path"  name="file_path" value="/" /> Enter the directory that the file should be placed into, this should start and end with /<br />
+                <input type="text" id="file_name"  name="file_name" value="" /> filename - use this to rename a file on upload if required.<br />
+				<input type="file" id="content" name="content" class="file" onchange="SplitFile();"/><br />
+				<input type="submit" value="upload file">
+			</form>
+
+		</div>
+	</body>
+</html>

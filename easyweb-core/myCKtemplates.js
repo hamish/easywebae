@@ -42,7 +42,7 @@ CKEDITOR.addTemplates( 'default',
 				html:
 					'<form action="https://www.paypal.com/cgi-bin/webscr" method="post">'+
 					'<input type="hidden" name="business" value="{{preferences.paypal_id}}">'+
-					{% include "fcktemplate_common_values.html" %}
+					{% include "cktemplate_common_values.js" %}
 					'<br />'+
 					'</form>'					
 			},
@@ -57,7 +57,7 @@ CKEDITOR.addTemplates( 'default',
 					""+<r><![CDATA[
 						<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
 						<input type="hidden" name="business" value="{{preferences.paypal_sandbox_id}}">
-						{% include "fcktemplate_common_values.html" %}
+						{% include "cktemplate_common_values.js" %}
 						<br />(Sandbox)
 						</form>	
 					]]></r>;								

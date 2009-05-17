@@ -1,5 +1,6 @@
-//config.TemplatesXmlPath = '/fcktemplate.xml' ;
-//config.TemplateReplaceAll = false ;
-//config.TemplateReplaceCheckbox = false ;
-CKEDITOR.config.templates_files=[CKEDITOR.getUrl('/myCKtemplates.js')];
-CKEDITOR.config.templates_replaceContent = false;
+FCKConfig.TemplatesXmlPath = '/fcktemplate.xml' ;
+FCKConfig.TemplateReplaceAll = false ;
+FCKConfig.TemplateReplaceCheckbox = false ;
+
+FCKConfig.LinkBrowserURL = FCKConfig.BasePath + 'filemanager/browser/default/browser.html?Connector=' + encodeURIComponent( '/filemanager/connectors/py/connector.py') ;
+
