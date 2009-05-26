@@ -31,7 +31,7 @@ class EasywebTests(unittest.TestCase):
 
 
         self.click_and_wait(sel, "link=External Tools")
-        self.click_and_wait(sel, "link=sitemap")
+        self.click_and_wait(sel, "id=sitemap")
         self.assert_src_contains_element(sel, url_included)
         self.assert_src_does_not_contain_element(sel, url_excluded)
 
@@ -83,7 +83,7 @@ class EasywebTests(unittest.TestCase):
 
         self.login(sel)
         self.create_new_page(sel, url, title, body)
-        # Verify that the url works while logged in.hl7 datatypes V3
+        # Verify that the url works while logged in.
         self.open_and_wait(sel, url)
         self.failUnless(sel.is_text_present(body))
 
@@ -126,7 +126,7 @@ class EasywebTests(unittest.TestCase):
         else:
             sel.select("include_in_sitemap", "label=No")
         self.setRichTextContent(sel, body)
-        self.click_and_wait(sel, "//form[@name='page_content']//button[@name='Save']")
+        self.click_and_wait(sel, "//form[@name='page_content']//td[@id='save']")
 
     def assert_error_page(self, sel, url):
         self.open_and_wait(sel, url)
@@ -138,8 +138,9 @@ class EasywebTests(unittest.TestCase):
         self.set_page_values_and_submit(sel, new_url, new_title, new_body, sitemap)
 
     def create_new_page(self, sel, url, title, body, sitemap=0):
-        self.open_and_wait(sel, "/admin/pages.html")       
-        self.click_and_wait(sel, "link=add a new page")
+        self.open_and_wait(sel, "/admin/pages.html")
+        self.click_and_wait(sel, "//td[@id='new_page_link']")
+        #self.click_and_wait(sel, "link=add a new page")
         self.set_page_values_and_submit(sel, url, title, body, sitemap)
 
     def login(self, sel):
@@ -154,7 +155,9 @@ class EasywebTests(unittest.TestCase):
     def set_anylitics_id(self, sel, anylitics_id):
         self.open_and_wait(sel, "/admin/preferences.html")
         sel.type("anylitics_id", anylitics_id)
-        self.click_and_wait(sel,"Save")
+        sel.type("admin_email", "fake@fake.fake");
+        sel.type("paypal_id", "fake@fake.fake");
+        self.click_and_wait(sel,"//td[@id='save']")
 
 
     def open_and_wait(self, sel, url):

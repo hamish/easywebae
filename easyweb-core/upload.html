@@ -33,13 +33,43 @@
 		<div class="content">
 			<h1>Upload</h1>
 
-            <form enctype="multipart/form-data" id="new_product" name="upload_file" action="/admin/upload/" method="post">
-                <input type="text" id="file_path"  name="file_path" value="/" /> Enter the directory that the file should be placed into, this should start and end with /<br />
-                <input type="text" id="file_name"  name="file_name" value="" /> filename - use this to rename a file on upload if required.<br />
-				<input type="file" id="content" name="content" class="file" onchange="SplitFile();"/><br />
-				<input type="submit" value="upload file">
-			</form>
+            <form enctype="multipart/form-data" id="upload_file" name="upload_file" action="/admin/upload/" method="post">
 
+                <table cellspacing="0" cellpadding="0" class="hasHTMLeditor">
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>Prefix:</th>
+                        <td><input class="name validate" type="text" name="file_path" id="file_path" value="/" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">This is inserted into the beginnig of the URL for the uploaded file</td>
+                        <td name="comment" class="error hidden">Please ensure that this value starts and ends with /</td>
+                    </tr>
+
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>File:</th>
+                        <td><input type="file" id="content"
+                                   name="content"
+                                   class="file" onchange="SplitFile();"/></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">Upload the file to your website</td>
+                    </tr>
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>FileName:</th>
+                        <td><input class="name validate" type="text" name="file_name" id="file_name" value="" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">Use this if you wish to change the file name</td>
+                        <td name="comment" class="error hidden">FileName cannot be empty</td>
+                    </tr>
+                    <tr class="new">
+                        <td id="save" colspan="2" name="submit" class="action"
+                            onclick="submitForm(dojo.byId('upload_file'))"
+                            onmouseover="dojo.addClass(this, 'active')"
+                            onmouseout="dojo.removeClass(this, 'active')">Upload</td>
+                        <td colspan="2" name="submit" class="cancel hidden"
+                            onclick="submitForm(dojo.byId('upload_file'))">Please complete required fields to continue</td>
+                        <td class="placeholder">&nbsp;</td>
+                    </tr>
+			    </table>
+			</form>
 		</div>
 	</body>
 </html>

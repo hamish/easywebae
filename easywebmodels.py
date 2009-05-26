@@ -5,8 +5,14 @@ class Page(db.Model):
     title = db.StringProperty()
     #html = db.TextProperty()
     html = db.BlobProperty()
+    style_key = db.StringProperty()
     #type = db.StringProperty(required=True, choices=set(["text", "image", "other"]))
     include_in_sitemap = db.BooleanProperty()
+    creation_date = db.DateTimeProperty(auto_now_add=True)
+    modification_date = db.DateTimeProperty(auto_now=True)
+
+class Style(db.Model):
+    content = db.BlobProperty()
     creation_date = db.DateTimeProperty(auto_now_add=True)
     modification_date = db.DateTimeProperty(auto_now=True)
 

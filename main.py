@@ -20,12 +20,26 @@ from google.appengine.api import urlfetch
 from google.appengine.api import mail
 
 from easywebmodels import *
- 
-class UserProductHandler(webapp.RequestHandler):
 
-    def redirect_to_product_payment(self, product, domain):
+from BeautifulSoup import BeautifulSoup
+#### Base Class #######
+class EasywebRequestHandler(webapp.RequestHandler):
+    def get_preferences(self):
         preference_list = db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
         preferences = preference_list.get()
+        return preferences
+    def get_domain(self):
+        domain_url = self.request.url
+        pos = domain_url.find('/', 9) # find the first / after the http:// part
+        domain= domain_url[:pos]
+        return domain        
+#### END Base Class #######
+            
+class UserProductHandler(EasywebRequestHandler):
+
+    def redirect_to_product_payment(self, product, domain):
+        #preference_list = db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+        preferences = self.get_preferences()
         parameters = {
                       "business": "%s" % preferences.paypal_id, 
                       "cmd": "_xclick", 
@@ -47,10 +61,7 @@ class UserProductHandler(webapp.RequestHandler):
         self.redirect(payment_link)
 
     def get(self):
-        domain_url = self.request.url
-        pos = domain_url.find('/', 9) # find the first / after the http:// part
-        domain= domain_url[:pos]     
-           
+        domain= self.get_domain()           
         url = self.request.path
         id=''
         match = re.match("/product/([0-9]*)/?", url)
@@ -73,8 +84,7 @@ class UserProductHandler(webapp.RequestHandler):
             else:
                 self.response.out.write ("Unable to find the ebook you wish to purchase")
             
-class DownloadHandler(webapp.RequestHandler):
-    
+class DownloadHandler(EasywebRequestHandler):   
     def get(self):
         url = self.request.path
         match = re.match("/download/(.*)/", url)
@@ -83,42 +93,69 @@ class DownloadHandler(webapp.RequestHandler):
         payment = db.get(key)
         product = db.get(payment.product_key)
         if product.file_content:
-            mimetypes.init()            
-            #self.response.headers['Content-Type'] = 'image/jpeg'
+            mimetypes.init()
             self.response.headers['Content-Type'] = mimetypes.guess_type(product.file_name)[0]
             self.response.out.write(product.file_content)
         else:
             self.error(404)
+class StyleHandler(EasywebRequestHandler):
+  def get(self):
+        domain= self.get_domain()           
+        url = self.request.path
+        id=''
+        match = re.match("/style/([a-zA-Z0-9]*).css", url)
+        if match:
+            id=match.groups()[0]
+        if id:
+            key = db.Key(id)
+            logging.info("Style: %s" % key)
+            style = db.get(key)
+            if style:
+                encoding = mimetypes.guess_type(url)[0]
+                if encoding:
+                    self.response.headers['Content-Type'] = encoding
+                self.response.out.write (style.content)
+            else:
+                self.response.set_status(404)
+                self.response.out.write ("No corresponding style in database for id: " + id)                
+        else:
+            self.response.set_status(404)
+            self.response.out.write ("Style not found")
 
-class MainHandler(webapp.RequestHandler):
+class MainHandler(EasywebRequestHandler):
   def get(self):
     url = self.request.path
-    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     pages=db.GqlQuery("SELECT * FROM Page WHERE url = :1 LIMIT 1", url)
     
     if (pages.count() < 1):
         path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'error.html')
         self.response.set_status(404)
         self.response.out.write(template.render(path, {'url': url, 'is_admin': users.is_current_user_admin() }))
-
     else :
         page = pages.get()
         html=page.html
         title = page.title
         values = {
+              'page' : page,
               'body' : html,
               'title' : title,
-              'preferences' : preference_list.get(),
+              'preferences' : self.get_preferences(),
               'url': url, 
               'is_admin': users.is_current_user_admin()
                   }
-        path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'content.html')
-        #self.response.out.write(template.render(path, values))
-        if (not url.endswith("/")):
-            self.response.headers['Content-Type'] = mimetypes.guess_type(url)[0]
-        self.response.out.write(html)
+        encoding = mimetypes.guess_type(url)[0]
+        if encoding:
+            self.response.headers['Content-Type'] = encoding
+            logging.info("setting encoding to: %s" % encoding)
+        if (not encoding or encoding=='text/html'):
+            logging.info("template")
+            path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'content.html')
+            self.response.out.write(template.render(path, values))
+        else:
+            logging.info("raw")
+            self.response.out.write(html)
 
-class AdminHandler(webapp.RequestHandler):
+class AdminHandler(EasywebRequestHandler):
   def get(self):
     template_name = 'admin.html'
     url=self.request.path
@@ -128,46 +165,40 @@ class AdminHandler(webapp.RequestHandler):
         logging.debug ("template: %s" % my_file)
         if my_file:
             template_name=my_file
-    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
     products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
     payments=db.GqlQuery("SELECT * FROM Payment ORDER BY creation_date")
-#    images=db.GqlQuery("SELECT * FROM Image ORDER BY creation_date")
     values = {
-#              'images' : images,
               'pages' : pages,
               'products' : products,
               'payments' : payments,
-              'preferences' : preference_list.get(),
+              'preferences' : self.get_preferences(),
               'logout_url': users.create_logout_url("/"),
               'template_name': template_name,
+              'domain': self.get_domain(),
               }
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', template_name)
     self.response.out.write(template.render(path, values))
 
-class TemplateHandler(webapp.RequestHandler):
+class TemplateHandler(EasywebRequestHandler):
   def get(self):
-    url = self.request.url
-    pos = url.find('/', 9) # find the first / after the http:// part
-    domian= url[:pos]
+#    url = self.request.url
+#    pos = url.find('/', 9) # find the first / after the http:// part
+#    domian= url[:pos]
     products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
-    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
     values = {
-              'domain' :domian,
+              'domain' :self.get_domain(),
               'products' : products,
-              'preferences' : preference_list.get(),
+              'preferences' : self.get_preferences(),
               }
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'fcktemplate.xml')
     self.response.out.write(template.render(path, values))
-class SitemapHandler(webapp.RequestHandler):
+class SitemapHandler(EasywebRequestHandler):
   def get(self):
-    url = self.request.url
-    pos = url.find('/', 9) # find the first / after the http:// part
-    domian= url[:pos]
     pages=db.GqlQuery("SELECT * FROM Page where include_in_sitemap = True ORDER BY url")
     values = {
               'pages' : pages,
-              'domain' :domian,
+              'domain' :self.get_domain(),
               }
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'sitemap.xml')
     self.response.out.write(template.render(path, values))
@@ -191,17 +222,46 @@ class UploadHandler(webapp.RequestHandler):
         msg = email.message_from_string(content)
         for part in msg.walk():
             ct = part.get_content_type()
-            if (ct.startswith("text") or ct.startswith("image")):
+            if (ct.startswith("text/html") or ct.startswith("image")):
                 regex = re.compile("file:///[A-Z]:/[a-zA-Z0-9]*/")
                 file_name = regex.sub( file_path , part.get('Content-Location'))
                 content = part.get_payload(decode=True)
-                if (ct.startswith("text")):
+                title="Uploaded File"
+                promote=False
+                style_key=""
+                if (ct.startswith("text/html")):
                     content = regex.sub( file_path , content)
+                    html_soup =  BeautifulSoup(content)
+                    logging.info("soup: %s" % html_soup.html.head.title)
+                    #### TODO - get the script elements
+#                    title_regex = re.compile("<title>(.*)<\/title>", re.IGNORECASE)
+#                    match = title_regex.search(content)
+                    title_match=str(html_soup.head.title.string)
+                    if title_match:
+                        title=title_match
+                    promote=True
+                    
+                    style_string=''
+                    styles = html_soup.findAll('style')
+                    if styles:
+                        for s in styles:
+                            style_string = "%s\n%s" % (style_string, s.contents[0])
+                        if style_string:
+                            style = Style()
+                            style.content=str(style_string)
+                            style.put()
+                            style_key=str(style.key())
+                            logging.info("added style: %s" % style_key)
+                    body_string=""
+                    for b in html_soup.html.body.contents:
+                        body_string="%s\n%s" %(body_string, b)
+                    content=str(body_string)
                 page = Page()
                 page.url = file_name
                 page.html = content
-                page.title = "test"
-                page.include_n_sitemap = True
+                page.title = title
+                page.include_in_sitemap = promote
+                page.style_key=style_key
                 page.put()
             
             logging.info("part:" + part.get_content_type())
@@ -212,7 +272,6 @@ class UploadHandler(webapp.RequestHandler):
         content=self.request.get("content")
         logging.info("upload:" + file_name)
         
-        # TODO: check if the file is an mht file and do the appropriate thing - otherwise store the file normally. 
         lower_file_name = file_name.lower()
         if (lower_file_name.endswith(".mht") or lower_file_name.endswith(".mhtml") ):
             self.process_mht_file(content, file_path)
@@ -464,6 +523,7 @@ def main():
                                         ('/purchase/ipn/', PaypalIPNHandler),
                                         ('/admin/upload/', UploadHandler),
                                         ('/product/.*', UserProductHandler),
+                                        ('/style/.*', StyleHandler),
                                         ('.*', MainHandler),
                                         ])
   wsgiref.handlers.CGIHandler().run(application)
