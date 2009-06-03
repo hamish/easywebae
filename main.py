@@ -21,18 +21,27 @@ from google.appengine.api import mail
 
 from easywebmodels import *
 
-from BeautifulSoup import BeautifulSoup
+from BeautifulSoup import BeautifulSoup, Tag, NavigableString
 #### Base Class #######
 class EasywebRequestHandler(webapp.RequestHandler):
     def get_preferences(self):
         preference_list = db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
-        preferences = preference_list.get()
+        preferences=Preferences()
+        if (preference_list.count() > 0):
+            preferences = preference_list.get()
         return preferences
     def get_domain(self):
         domain_url = self.request.url
         pos = domain_url.find('/', 9) # find the first / after the http:// part
         domain= domain_url[:pos]
-        return domain        
+        return domain
+    def get_page_for_write(self, url, type='Sales'):
+        pages=db.GqlQuery("SELECT * FROM Page WHERE url = :1 LIMIT 1", url)
+        page = pages.get()
+        if not page:
+            page=Page(type=type)
+            page.url=url
+        return page
 #### END Base Class #######
             
 class UserProductHandler(EasywebRequestHandler):
@@ -149,14 +158,49 @@ class MainHandler(EasywebRequestHandler):
             logging.info("setting encoding to: %s" % encoding)
         if (not encoding or encoding=='text/html'):
             logging.info("template")
-            path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'content.html')
-            self.response.out.write(template.render(path, values))
+            path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'tracker.js')
+            tracker=template.render(path, values)
+            end_body_loc = html.rfind('</body')
+            new="%s%s%s" % (html[:end_body_loc], tracker, html[end_body_loc:])
+            
+#            path1 = os.path.join(os.path.dirname(__file__),'easyweb-core', 'tracker1.js')
+#            tracker1=template.render(path1, values)
+#            path2 = os.path.join(os.path.dirname(__file__),'easyweb-core', 'tracker2.js')
+#            tracker2=template.render(path2, values)
+#            soup = BeautifulSoup(html)
+#            s1=Tag(soup, "script")
+#            s1['type']="text/javascript"
+#            t1=NavigableString(tracker1)
+#            s1.insert(0, t1)
+#            soup.html.body.insert(len(soup.html.body), s1)
+#            
+#            s2=Tag(soup, "script")
+#            s2['type']="text/javascript"
+#            t2=NavigableString(tracker2)
+#            s2.insert(0, t2)
+#            soup.html.body.insert(len(soup.html.body), s2)
+
+            #self.response.out.write("%s"%soup)
+            #self.response.out.write(html)
+            self.response.out.write(new)
         else:
             logging.info("raw")
             self.response.out.write(html)
 
 class AdminHandler(EasywebRequestHandler):
+  def setup_thanks_page(self):
+      thanks_pages=db.GqlQuery("SELECT * FROM Page WHERE type='Thanks' ORDER BY url ")
+      if (thanks_pages.count() < 1):
+          url = "/thanks/"
+          type = "Thanks"
+          page=self.get_page_for_write(url, type=type)
+          page.title = "Thanks"
+          page.html = "<h1>Thanks</h1>"
+          page.editor = "inplace"
+          page.include_in_sitemap = False
+          page.put()
   def get(self):
+    self.setup_thanks_page()
     template_name = 'admin.html'
     url=self.request.path
     match = re.match("/admin/(.*)$", url)
@@ -165,11 +209,13 @@ class AdminHandler(EasywebRequestHandler):
         logging.debug ("template: %s" % my_file)
         if my_file:
             template_name=my_file
-    pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
+    sales_pages=db.GqlQuery("SELECT * FROM Page WHERE type='Sales' ORDER BY url ")
+    thanks_pages=db.GqlQuery("SELECT * FROM Page WHERE type='Thanks' ORDER BY url ")
     products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
     payments=db.GqlQuery("SELECT * FROM Payment ORDER BY creation_date")
     values = {
-              'pages' : pages,
+              'sales_pages' : sales_pages,
+              'thanks_pages' : thanks_pages,
               'products' : products,
               'payments' : payments,
               'preferences' : self.get_preferences(),
@@ -203,81 +249,86 @@ class SitemapHandler(EasywebRequestHandler):
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'sitemap.xml')
     self.response.out.write(template.render(path, values))
 
-class SaveHandler(webapp.RequestHandler):
-  def post(self):
-    key_name = self.request.get('key')
-    page=Page()
-    if (key_name):
-        page= db.get(db.Key(key_name))
-    page.url = self.request.get('url')
-    page.title = self.request.get('title')
-    page.html = str(self.request.get('html'))
-    page.include_in_sitemap =  (self.request.get('include_in_sitemap', 'false') == 'true')
-    page.put()
-    self.redirect('/admin/pages.html')
-
-class UploadHandler(webapp.RequestHandler):
-
-    def process_mht_file(self, content, file_path):
+class SaveHandler(EasywebRequestHandler):
+    def process_mht_file(self, content, file_url, promote, type):
+        logging.info("process mht_file")
         msg = email.message_from_string(content)
+        file_path = file_url
+        if not file_url.endswith("/"):
+            pathloc= file_url.rfind("/")
+            file_path=file_url[:pathloc+1]
         for part in msg.walk():
             ct = part.get_content_type()
+            logging.info("process mht_file: part (%s)" %(ct))
             if (ct.startswith("text/html") or ct.startswith("image")):
                 regex = re.compile("file:///[A-Z]:/[a-zA-Z0-9]*/")
                 file_name = regex.sub( file_path , part.get('Content-Location'))
                 content = part.get_payload(decode=True)
                 title="Uploaded File"
-                promote=False
+                promote_file=False
+                file_type="File"
                 style_key=""
                 if (ct.startswith("text/html")):
                     content = regex.sub( file_path , content)
                     html_soup =  BeautifulSoup(content)
                     logging.info("soup: %s" % html_soup.html.head.title)
-                    #### TODO - get the script elements
-#                    title_regex = re.compile("<title>(.*)<\/title>", re.IGNORECASE)
-#                    match = title_regex.search(content)
                     title_match=str(html_soup.head.title.string)
                     if title_match:
                         title=title_match
-                    promote=True
-                    
-                    style_string=''
-                    styles = html_soup.findAll('style')
-                    if styles:
-                        for s in styles:
-                            style_string = "%s\n%s" % (style_string, s.contents[0])
-                        if style_string:
-                            style = Style()
-                            style.content=str(style_string)
-                            style.put()
-                            style_key=str(style.key())
-                            logging.info("added style: %s" % style_key)
-                    body_string=""
-                    for b in html_soup.html.body.contents:
-                        body_string="%s\n%s" %(body_string, b)
-                    content=str(body_string)
-                page = Page()
+                    promote_file=promote
+                    file_name = file_path
+                    file_type=type
+                page = self.get_page_for_write(file_name)
                 page.url = file_name
                 page.html = content
                 page.title = title
-                page.include_in_sitemap = promote
-                page.style_key=style_key
+                page.editor = 'Upload'
+                page.include_in_sitemap = promote_file
+                page.type=file_type
                 page.put()
-            
-            logging.info("part:" + part.get_content_type())
+                logging.info("url: %s type: %s" %(page.url, part.get_content_type()))
 
     def post(self):
-        file_path=self.request.get("file_path")        
+        logging.info("Save: post")
+        key_name = self.request.get('key')
+        url = self.request.get('url')
+        type = self.request.get('type', 'Sales')
+        editor=self.request.get('editor', 'upload')
+        promote = (self.request.get('include_in_sitemap', 'false') == 'true')
+        if editor=="upload":
+            content=self.request.get("content")
+            self.process_mht_file(content, url, promote, type)
+        else:
+            page=self.get_page_for_write(url, type=type)
+            if (key_name):
+                page= db.get(db.Key(key_name))
+            logging.info("Save: editor: %s" %(editor))
+            page.url = url
+            page.title = self.request.get('title')
+            page.editor = self.request.get('editor')
+            page.html = str(self.request.get('html'))
+            page.include_in_sitemap = promote
+            page.put()
+        self.redirect('/admin/pages.html')
+
+class UploadHandler(EasywebRequestHandler):
+
+    def post(self):
+        logging.info("**** upload handler called ** exiting")
+        self.response.out.write("**** upload handler called ** exiting")
+
+    def xpost(self):
+        file_url=self.request.get("file_url")        
         file_name=self.request.get("file_name")
         content=self.request.get("content")
         logging.info("upload:" + file_name)
         
         lower_file_name = file_name.lower()
         if (lower_file_name.endswith(".mht") or lower_file_name.endswith(".mhtml") ):
-            self.process_mht_file(content, file_path)
+            self.process_mht_file(content, file_url)
         else:
-            page = Page()
-            page.url = file_path + file_name
+            page = self.get_page_for_write(file_url)
+            page.url = file_url
             page.html = content
             page.title = "test"
             page.include_n_sitemap = False
@@ -286,21 +337,21 @@ class UploadHandler(webapp.RequestHandler):
 
         self.redirect('/admin/pages.html')    
 
-class PreferencesHandler(webapp.RequestHandler):
+class PreferencesHandler(EasywebRequestHandler):
   def post(self):
-    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
-    preferences = preference_list.get()
-    if (preference_list.count() < 1):    
-        preferences = Preferences()
-    preferences.anylitics_id = self.request.get('anylitics_id')
-    preferences.paypal_id = self.request.get('paypal_id')
-    preferences.paypal_sandbox_id = self.request.get('paypal_sandbox_id')
-    preferences.admin_email = self.request.get('admin_email')
-    
-    preferences.put()
-    self.redirect('/admin/preferences.html')
+      logging.info("save preferences:")
+      preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+      preferences = preference_list.get()
+      if (preference_list.count() < 1):    
+          preferences = Preferences()
+      preferences.anylitics_id = self.request.get('anylitics_id')
+      preferences.paypal_id = self.request.get('paypal_id')
+      preferences.paypal_sandbox_id = self.request.get('paypal_sandbox_id')
+      preferences.admin_email = self.request.get('admin_email')
+      preferences.put()
+      self.redirect('/admin/preferences.html')
 
-class ProductHandler(webapp.RequestHandler):
+class ProductHandler(EasywebRequestHandler):
     def post(self):
         key_name = self.request.get('key')
         product = Product()
@@ -324,7 +375,7 @@ class ProductHandler(webapp.RequestHandler):
         product.put()        
         self.redirect('/admin/book.html')
         
-class EditProductHandler(webapp.RequestHandler):
+class EditProductHandler(EasywebRequestHandler):
   def get(self):
     key_name = self.request.get('key')
     product={}
@@ -343,11 +394,12 @@ class EditProductHandler(webapp.RequestHandler):
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'edit_product.html')
     self.response.out.write(template.render(path, values))
 
-class EditHandler(webapp.RequestHandler):
+class EditHandler(EasywebRequestHandler):
   def get(self):
     key_name = self.request.get('key')
     url = self.request.get('url')
-    page={}
+    type = self.request.get('type', 'Sales')
+    page={ 'type' : type }
     if (key_name):
         page= db.get(db.Key(key_name))
     elif (url):
@@ -362,14 +414,14 @@ class EditHandler(webapp.RequestHandler):
     path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'edit.html')
     self.response.out.write(template.render(path, values))
 
-class AdminRedirector(webapp.RequestHandler):
+class AdminRedirector(EasywebRequestHandler):
     def post(self):
         self.get()
     def get(self):
         self.redirect('/admin/pages.html')
 
         
-class PaypalIPNHandler(webapp.RequestHandler):
+class PaypalIPNHandler(EasywebRequestHandler):
     live_url = "https://www.paypal.com/cgi-bin/webscr"
     test_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
 

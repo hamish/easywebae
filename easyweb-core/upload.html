@@ -34,16 +34,8 @@
 			<h1>Upload</h1>
 
             <form enctype="multipart/form-data" id="upload_file" name="upload_file" action="/admin/upload/" method="post">
-
+				<input type="hidden" name="file_name" id="file_name" value="" />
                 <table cellspacing="0" cellpadding="0" class="hasHTMLeditor">
-                    <tr class="highlightable">
-                        <th><span class="required">*</span>Prefix:</th>
-                        <td><input class="name validate" type="text" name="file_path" id="file_path" value="/" /></td>
-                        <td name="comment" class="placeholder">&nbsp;</td>
-                        <td name="comment" class="note hidden">This is inserted into the beginnig of the URL for the uploaded file</td>
-                        <td name="comment" class="error hidden">Please ensure that this value starts and ends with /</td>
-                    </tr>
-
                     <tr class="highlightable">
                         <th><span class="required">*</span>File:</th>
                         <td><input type="file" id="content"
@@ -52,13 +44,15 @@
                         <td name="comment" class="placeholder">&nbsp;</td>
                         <td name="comment" class="note hidden">Upload the file to your website</td>
                     </tr>
+
                     <tr class="highlightable">
-                        <th><span class="required">*</span>FileName:</th>
-                        <td><input class="name validate" type="text" name="file_name" id="file_name" value="" /></td>
+                        <th><span class="required">*</span>Location:</th>
+                        <td><input class="name validate" type="text" name="file_url" id="file_url" value="/" /></td>
                         <td name="comment" class="placeholder">&nbsp;</td>
-                        <td name="comment" class="note hidden">Use this if you wish to change the file name</td>
-                        <td name="comment" class="error hidden">FileName cannot be empty</td>
+                        <td name="comment" class="note hidden">This is the URL where the file will be made available.</td>
+                        <td name="comment" class="error hidden">Please ensure that this value starts with /</td>
                     </tr>
+
                     <tr class="new">
                         <td id="save" colspan="2" name="submit" class="action"
                             onclick="submitForm(dojo.byId('upload_file'))"

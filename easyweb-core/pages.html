@@ -21,13 +21,13 @@
 		{% include "menu.html" %}
 
 		<div class="content">
-			<h1>Web Pages</h1>
+			<h1>Sales Pages</h1>
 			
 			<table cellpadding="0" cellspacing="0"> 
-				{% for page in pages %}
+				{% for page in sales_pages %}
 				{% if forloop.first %}
 				<tr>
-					<th>URL</th>
+					<th>Location</th>
 					<th>Title</th>
 					<th class="nowrap">On Sitemap</th>
 					<th>&nbsp;</th>
@@ -54,6 +54,38 @@
 				</tr>
 			</table>
 			
+			<h1>Thanks Pages</h1>
+			
+			<table cellpadding="0" cellspacing="0"> 
+				{% for page in thanks_pages %}
+				{% if forloop.first %}
+				<tr>
+					<th>Location</th>
+					<th>Title</th>
+					<th class="nowrap">On Sitemap</th>
+					<th>&nbsp;</th>
+					<th>&nbsp;</th>
+				</tr>
+				{% endif %}
+				<tr>
+					<td class="url">{{page.url}}</td>
+					<td class="title">{{page.title}}</td>
+					<td class="checkbox">{% if page.include_in_sitemap %}Yes{% else %}No{% endif %}</td>
+					<td class="action" onclick='document.location="/admin/edit/?key={{page.key}}"' id="edit_{{page.url}}"
+						onmouseover="dojo.addClass(this, 'active')"
+						onmouseout="dojo.removeClass(this, 'active')">edit</td>
+					<td class="action go" onclick='document.location="{{page.url}}"' id="go_{{page.url}}"
+						onmouseover="dojo.addClass(this, 'active')"
+						onmouseout="dojo.removeClass(this, 'active')">go</td>
+				</tr>
+				{% endfor %}
+				
+				<tr class="new">
+					<td id="new_page_link" colspan="5" class="action" onclick='document.location="/admin/new/"'
+						onmouseover="dojo.addClass(this, 'active')"
+						onmouseout="dojo.removeClass(this, 'active')">add a new page</td>
+				</tr>
+			</table>
 
 		</div>
 	</body>

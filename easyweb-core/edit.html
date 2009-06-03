@@ -11,6 +11,10 @@
         <script type="text/javascript" src="/static/admin/js/form.js"></script>
 
 		<script type="text/javascript">
+		    function editorChanged(){
+		    	// TODO: hide the parts o the form that are not required.
+		    }
+		    
             function setSitemapComment() {
                 var yesText = "A link to this page will be included on <a href='/Sitemap.xml'>your sitemap</a>.";
                 var noText = "This page will <b>not</b> be included on <a href='/Sitemap.xml'>your sitemap</a>.";
@@ -27,6 +31,15 @@
             dojo.addOnLoad(function () {
                 setSitemapComment();
             });
+
+            function SplitFile() {
+                var file = document.getElementById("content").value;
+                file = file.replace(/\\/g, "/");
+                var parts = file.split("/");
+                var filename = parts[parts.length - 1];
+
+                document.getElementById("file_name").value = filename;
+            }
 
             function checkLeadingSlash(field) {
                 // add a leading / if not present
@@ -45,8 +58,10 @@
 			<h1>{% if page.key %}Edit{% else %}New{% endif %} Page</h1>
 
 			
-			<form id="new_page" action="/admin/save/" method="POST" name="page_content" onsubmit="return validateAll()">
+			<form enctype="multipart/form-data" id="new_page" action="/admin/save/" method="POST" name="page_content" onsubmit="return validateAll()">
 				<input type="hidden" name="key"  value="{{page.key}}" />
+				<input type="hidden" name="type"  value="{{page.type}}" />
+				<input type="hidden" name="file_name" id="file_name" value="" />
                 
                 <table cellpadding="0" cellspacing="0" class="hasHTMLeditor">
                     <tr class="highlightable">
@@ -57,19 +72,40 @@
                         <td name="comment" class="error hidden">Please enter a URL containing only letters, numbers, hyphen, underscore, dot and forward slash with <b>no spaces</b></td>
                     </tr>
                     <tr class="highlightable">
-                        <th><span class="required">*</span>Title:</th>
-                        <td><input type="text" id="title" name="title" class="title validate" value="{{page.title}}" /></td>
-                        <td name="comment" class="placeholder">&nbsp;</td>
-                        <td name="comment" class="note hidden">This will be displayed at the top of the browser window</td>
-                        <td name="comment" class="error hidden">Please enter a title</td>
-                    </tr>
-                    <tr class="highlightable">
                         <th class="nowrap">Promote this page:</th>
                         <td><select id="include_in_sitemap" name="include_in_sitemap" onchange="setSitemapComment()">
                             <option value="true">Yes</option>
                             <option value="false"{% if not page.include_in_sitemap and page.key %} selected="selected"{% endif %}>No</option></select></td>
                         <td name="comment" class="placeholder">&nbsp;</td>
                         <td name="comment" class="note hidden"></td>
+                    </tr>
+                    <tr class="highlightable">
+                        <th class="nowrap">Editor:</th>
+                        <td>{% if page.editor %}{{page.editor}}<input type="hidden" name="editor" id="editor" value="{{page.editor}}" />{% else %}
+                        <select id="editor" name="editor" onchange="editorChanged()">
+                            <option value="upload"{% ifnotequal page.editor 'inplace' %} selected="selected"{% endifnotequal %}>Upload</option>
+                            <option value="inplace"{% ifequal page.editor 'inplace' %} selected="selected"{% endifequal %}>Inplace</option></select>
+                            {% endif %}
+                            </td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden"></td>
+                    </tr>
+
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>File:</th>
+                        <td><input type="file" id="content"
+                                   name="content"
+                                   class="file" onchange="SplitFile();"/></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">Upload the file to your website</td>
+                    </tr>
+
+                    <tr class="highlightable">
+                        <th><span class="required">*</span>Title:</th>
+                        <td><input type="text" id="title" name="title" class="title validate" value="{{page.title}}" /></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">This will be displayed at the top of the browser window</td>
+                        <td name="comment" class="error hidden">Please enter a title</td>
                     </tr>
                 </table>
 
