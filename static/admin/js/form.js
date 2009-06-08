@@ -6,6 +6,7 @@ var haltHighlighting = false;
 
 // detect highlightable rows on load
 dojo.addOnLoad(function () {
+    var showAdvanced = false;
     var highlightRows = dojo.query("[class^=highlightable]");
 
     for (var i = 0; i < highlightRows.length; i++) {
@@ -41,6 +42,13 @@ dojo.addOnLoad(function () {
                 dojo.connect(fields[j], eventType, function () {
                     validate(this);
                 });
+            }
+
+            // show advanced options if any have a value
+            if (dojo.hasClass(fields[j].parentNode.parentNode, "advanced") &&
+                fields[j].value && !showAdvanced) {
+                showAdvanced = true;
+                toggleAdvancedOptions();
             }
         }
     }
@@ -185,5 +193,31 @@ function toggleSubmit (/*boolean*/submitClass) {
 function submitForm(form) {
     if (validateAll()) {
         form.submit();
+    }
+}
+
+// show/hide advanced options
+function toggleAdvancedOptions() {
+    var toggleImg = dojo.byId("toggleAdvanced");
+
+    dojo.query(".advanced").forEach(function (advanced) {
+        if (dojo.hasClass(advanced, "toggle")) {
+            return; // this is the toggle row, do not hide it
+        }
+        if (toggleImg.alt == "show") {
+            dojo.removeClass(advanced, "hidden");
+        } else {
+            dojo.addClass(advanced, "hidden");
+        }
+    });
+
+    if (toggleImg.alt == "show") {
+
+            toggleImg.src = "/static/admin/images/contract.gif"
+            toggleImg.alt = "hide";
+    } else {
+        
+            toggleImg.src = "/static/admin/images/expand.gif"
+            toggleImg.alt = "show";
     }
 }

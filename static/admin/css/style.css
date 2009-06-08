@@ -9,6 +9,10 @@ body {
 .hidden {
     display: none;
 }
+.fadeout {
+    display: none;
+    visibility: hidden;
+}
 
 span.required {
     color: #933;
@@ -260,26 +264,37 @@ table tr.noborder th,
     table tr.noborder td {
     border-width: 0;
 }
+table tr.toggle td {
+    font-size: 0.9em;
+}
+table tr.toggle span {
+	color: #3D7AB8;
+    vertical-align: middle;
+    cursor: pointer;
+}
+table tr.toggle img {
+    vertical-align: middle;
+    border: none;
+}
 table tr.advanced th,
     table tr.advanced td {
-	background: #F2E6D9;
+    color: #333399;
+    background: #ECECF8;
 }
 table tr.advanced th {
-    color: #604020;
 }
 table tr.advanced td.action {
-	background: #E2C8AB;
+	background: #ECECF8;
 }
 table tr.advanced td.active {
-	background: #CC9966;
+	background: #C7C6EC;
 }
 table tr.advanced.highlight th,
     table tr.advanced.highlight td {
-	background: #E2C8AB;
+	background: #C7C6EC;
 }
 table tr.advanced.highlight td.note {
-    color: #666;
-	background: #F2E6D9;
+	background: #ECECF8;
 }
 table tr.spacer th {
 	line-height: 1em;

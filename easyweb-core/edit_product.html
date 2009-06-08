@@ -46,15 +46,6 @@
 
                 <table cellspacing="0" cellpadding="0" class="hasHTMLeditor">
                     <tr class="highlightable">
-                        <th>Ebook File:</th>
-                        <td>{% if product.sucess_email_subject %}current file: <!--<a href="">-->{{product.file_name}}<!--</a>-->
-                            <br />{% endif %}<input type="file" id="product_file_upload"
-                                   name="product_file_upload"
-                                   class="file" onchange="SplitFile();"/></td>
-                        <td name="comment" class="placeholder">&nbsp;</td>
-                        <td name="comment" class="note hidden">Upload {% if product.key %}a new version of{% endif %} your ebook</td>
-                    </tr>
-                    <tr class="highlightable">
                         <th><span class="required">*</span>Name:</th>
                         <td><input class="name validate" type="text" name="product_name" value="{{product.name}}" /></td>
                         <td name="comment" class="placeholder">&nbsp;</td>
@@ -71,6 +62,15 @@
                         <td name="comment" class="error hidden">Please enter only digits and a decimal point, <b>no spaces</b> - eg <i>30.00</i></td>
                     </tr>
                     <tr class="highlightable">
+                        <th>Ebook File:</th>
+                        <td>{% if product.sucess_email_subject %}current file: <!--<a href="">-->{{product.file_name}}<!--</a>-->
+                            <br />{% endif %}<input type="file" id="product_file_upload"
+                                   name="product_file_upload"
+                                   class="file" onchange="SplitFile();"/></td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                        <td name="comment" class="note hidden">Upload {% if product.key %}a new version of{% endif %} your ebook</td>
+                    </tr>
+                    <tr class="highlightable">
                         <th><span class="required">*</span>Successful Purchase:</th>
                         <td><select id="product_return_url" name="product_return_url" class="dropdown validate">
                                 <option value="">please select</option>
@@ -82,17 +82,24 @@
                         <td name="comment" class="note hidden">This is the page your customers will see after a successful purchase</td>
                         <td name="comment" class="error hidden">Please choose a page - create more on the <a href="/admin/pages.html">Web Pages</a> tab</td>
                     </tr>
-                    <tr class="highlightable">
-                        <th><span class="required">*</span>Failed Purchase:</th>
-                        <td><select id="product_return_cancel_url" name="product_return_cancel_url" class="dropdown validate">
+
+                    <tr class="toggle advanced">
+                        <td colspan="2" onclick="toggleAdvancedOptions()"
+							onmouseover="dojo.addClass(this, 'active')"
+							onmouseout="dojo.removeClass(this, 'active')"><img id="toggleAdvanced" src="/static/admin/images/expand.gif" alt="show" /> advanced options</td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                    </tr>
+                    
+                    <tr class="highlightable advanced hidden">
+                        <th>Second Chance:</th>
+                        <td><select id="product_return_cancel_url" name="product_return_cancel_url" class="dropdown">
                                 <option value="">please select</option>
                             {% for page in pages %}
                             <option value="{{page.url}}" {% ifequal product.return_cancel_url page.url %}selected="true"{% endifequal %} >{{page.url}}</option>
                             {% endfor %}
                                 </select></td>
                         <td name="comment" class="placeholder">&nbsp;</td>
-                        <td name="comment" class="note hidden">This is the page your customers will see if there is a problem with their purchase</td>
-                        <td name="comment" class="error hidden">Please choose a page - create more on the <a href="/admin/pages.html">Web Pages</a> tab</td>
+                        <td name="comment" class="note hidden">This is the page your customers will see if they cancel their purchase before paying</td>
                     </tr>
                 </table>
 

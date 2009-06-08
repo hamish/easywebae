@@ -1,35 +1,82 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
-		
+
 		<title>{% if page.key %}Edit{% else %}New{% endif %} Page</title>
-		
+
 
 		{% include "head.html" %}
 		{% include "rich_text_editor_head.html" %}
 
         <script type="text/javascript" src="/static/admin/js/form.js"></script>
 
-		<script type="text/javascript">
-		    function editorChanged(){
-		    	// TODO: hide the parts o the form that are not required.
-		    }
-		    
+        <script type="text/javascript">
+            dojo.require("dojo.NodeList-fx");
+            dojo.require("dojo.fx.easing");
+            dojo.require("dojo._base.html");
+
             function setSitemapComment() {
-                var yesText = "A link to this page will be included on <a href='/Sitemap.xml'>your sitemap</a>.";
-                var noText = "This page will <b>not</b> be included on <a href='/Sitemap.xml'>your sitemap</a>.";
+                var yesText = "A link to this page will be included on your sitemap.";
+                var noText = "This page will <b>not</b> be included on your sitemap.";
                 var sitemapSelect = dojo.byId("include_in_sitemap");
                 var commentCell = dojo.query("[class^=note]", sitemapSelect.parentNode.parentNode)[0];
 
-                if (sitemapSelect.value == "true") {
+                if (sitemapSelect.checked) {
                     commentCell.innerHTML = yesText;
                 } else {
                     commentCell.innerHTML = noText;
                 }
             }
 
+            function showEditorFields() {
+                var uploadText = "Edit your page in Word, save it as a Single File Webpage (.mht) and upload here.";
+                var inplaceText = "Edit your page right here!";
+                var selectBox = dojo.byId("editor");
+                var commentCell = dojo.query("[class^=note]", selectBox.parentNode.parentNode)[0];
+
+                if (selectBox.value == "upload") {
+                    commentCell.innerHTML = uploadText;
+                    toggleFade(dojo.byId("fileupload"), "in");
+                    dojo.addClass(dojo.byId("pagetitle"), "hidden");
+                    toggleFade(dojo.byId("pageeditor"), "out");
+                    dojo.removeClass(dojo.byId("button-placeholder"), "hidden");
+                    // set/unset validate for related fields
+                    dojo.addClass(dojo.byId("content"), "validate");
+                    dojo.removeClass(dojo.byId("title"), "validate");
+                } else {
+                    commentCell.innerHTML = inplaceText;
+                    dojo.addClass(dojo.byId("fileupload"), "hidden");
+                    toggleFade(dojo.byId("pagetitle"), "in");
+                    toggleFade(dojo.byId("pageeditor"), "in");
+                    dojo.addClass(dojo.byId("button-placeholder"), "hidden");
+                    // set/unset validate for related fields
+                    dojo.removeClass(dojo.byId("content"), "validate");                   
+                    dojo.addClass(dojo.byId("title"), "validate");
+                }
+
+                // validate form if there are already errors
+                if (numErrors > 0) {
+                    validateAll();
+                }
+            }
+            function toggleFade(element, fade) {
+                if (fade == "in") {
+                    dojo.removeClass(element, "hidden");
+                    dojo.fx.wipeIn({node: element,duration: 400}).play();
+                } else {
+                    dojo.fx.wipeOut({
+                        node: element,
+                        duration: 400,
+                        onEnd: function() {
+                            dojo.addClass(element, "hidden");
+                        }
+                    }).play();
+                }
+            }
+
             dojo.addOnLoad(function () {
                 setSitemapComment();
+                showEditorFields();
             });
 
             function SplitFile() {
@@ -42,13 +89,13 @@
             }
 
             function checkLeadingSlash(field) {
-                // add a leading / if not present
+                // add a leading "/" if not present
                 if (field.value != "" && field.value.indexOf("/") != 0) {
                     field.value = "/" + field.value;
                 }
             }
         </script>
-		
+
 	</head>
 	<body>
 
@@ -57,8 +104,7 @@
 		<div class="content">
 			<h1>{% if page.key %}Edit{% else %}New{% endif %} Page</h1>
 
-			
-			<form enctype="multipart/form-data" id="new_page" action="/admin/save/" method="POST" name="page_content" onsubmit="return validateAll()">
+            <form enctype="multipart/form-data" id="new_page" action="/admin/save/" method="POST" name="page_content" onsubmit="return validateAll()">
 				<input type="hidden" name="key"  value="{{page.key}}" />
 				<input type="hidden" name="type"  value="{{page.type}}" />
 				<input type="hidden" name="file_name" id="file_name" value="" />
@@ -71,36 +117,38 @@
                         <td name="comment" class="note hidden">URLs cannot contain spaces and must start with &quot;/&quot; - eg <i>/my-page.htm</i></td>
                         <td name="comment" class="error hidden">Please enter a URL containing only letters, numbers, hyphen, underscore, dot and forward slash with <b>no spaces</b></td>
                     </tr>
+
                     <tr class="highlightable">
-                        <th class="nowrap">Promote this page:</th>
-                        <td><select id="include_in_sitemap" name="include_in_sitemap" onchange="setSitemapComment()">
-                            <option value="true">Yes</option>
-                            <option value="false"{% if not page.include_in_sitemap and page.key %} selected="selected"{% endif %}>No</option></select></td>
+                        <th class="nowrap">Promote:</th>
+                        <td><input id="include_in_sitemap" type="checkbox" onchange="setSitemapComment()" value="true"{% if page.include_in_sitemap or not page.key %} checked="checked"{% endif %}>
+                            <label for="include_in_sitemap">Promote this page to Google</label> (via <a href='/Sitemap.xml'>your sitemap</a>)</td>
                         <td name="comment" class="placeholder">&nbsp;</td>
                         <td name="comment" class="note hidden"></td>
                     </tr>
+
+                {% if not page.editor %}
                     <tr class="highlightable">
                         <th class="nowrap">Editor:</th>
-                        <td>{% if page.editor %}{{page.editor}}<input type="hidden" name="editor" id="editor" value="{{page.editor}}" />{% else %}
-                        <select id="editor" name="editor" onchange="editorChanged()">
-                            <option value="upload"{% ifnotequal page.editor 'inplace' %} selected="selected"{% endifnotequal %}>Upload</option>
-                            <option value="inplace"{% ifequal page.editor 'inplace' %} selected="selected"{% endifequal %}>Inplace</option></select>
-                            {% endif %}
+                        <td><select id="editor" name="editor" onchange="showEditorFields();">
+                            <option value="upload"{% ifnotequal page.editor 'inplace' %} selected="selected"{% endifnotequal %}>Upload Word document</option>
+                            <option value="inplace"{% ifequal page.editor 'inplace' %} selected="selected"{% endifequal %}>Edit online</option></select>
+
                             </td>
                         <td name="comment" class="placeholder">&nbsp;</td>
                         <td name="comment" class="note hidden"></td>
                     </tr>
+                {% endif %}
 
-                    <tr class="highlightable">
+                    <tr id="fileupload" class="highlightable{% ifequal page.editor 'inplace' %} hidden{% endifequal %}">
                         <th><span class="required">*</span>File:</th>
                         <td><input type="file" id="content"
                                    name="content"
-                                   class="file" onchange="SplitFile();"/></td>
+                                   class="file validate" onchange="SplitFile();"/></td>
                         <td name="comment" class="placeholder">&nbsp;</td>
-                        <td name="comment" class="note hidden">Upload the file to your website</td>
+                        <td name="comment" class="note hidden">Upload your Single File Webpage (.mht)</td>
+                        <td name="comment" class="error hidden">Please choose a Single File Webpage (.mht) to upload</td>
                     </tr>
-
-                    <tr class="highlightable">
+                    <tr id="pagetitle" class="highlightable{% ifnotequal page.editor 'inplace' %} hidden{% endifnotequal %}">
                         <th><span class="required">*</span>Title:</th>
                         <td><input type="text" id="title" name="title" class="title validate" value="{{page.title}}" /></td>
                         <td name="comment" class="placeholder">&nbsp;</td>
@@ -109,25 +157,25 @@
                     </tr>
                 </table>
 
-                <p class="HTMLeditor"><textarea id="rich_text" name="html" rows="20" cols="40">{{page.html|escape}}</textarea></p>
+                <p id="pageeditor" class="HTMLeditor{% ifnotequal page.editor 'inplace' %} hidden{% endifnotequal %}"><textarea id="rich_text" name="html" rows="20" cols="40">{{page.html|escape}}</textarea></p>
 
                 <table cellpadding="0" cellspacing="0" class="hasHTMLeditor">
                     <tr class="new">
                         <td id="save" name="submit" class="action"
                             onclick="submitForm(dojo.byId('new_page'))"
-							onmouseover="dojo.addClass(this, 'active')"
-							onmouseout="dojo.removeClass(this, 'active')">save</td>
+                            onmouseover="dojo.addClass(this, 'active')"
+                            onmouseout="dojo.removeClass(this, 'active')">save</td>
                         <td name="submit" class="cancel hidden"
                             onclick="submitForm(dojo.byId('new_page'))">Please complete required fields to continue</td>
                         <td class="action cancel" style="width:20px"
                             title="Cancel - your changes will not be saved"
                             onclick="document.location='/admin/pages.html'"
-							onmouseover="dojo.addClass(this, 'activecancel')"
-							onmouseout="dojo.removeClass(this, 'activecancel')">X</td>
-					</tr>
-			    </table>
-
-			</form>
+                            onmouseover="dojo.addClass(this, 'activecancel')"
+                            onmouseout="dojo.removeClass(this, 'activecancel')">X</td>
+                        <td id="button-placeholder" name="comment" class="placeholder">&nbsp;</td>
+                    </tr>
+                </table>
+            </form>
 
 		</div>
 	</body>
