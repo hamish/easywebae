@@ -221,3 +221,28 @@ function toggleAdvancedOptions() {
             toggleImg.alt = "show";
     }
 }
+
+// toggle an element with an id of elementName
+// if there is a corresponding element with an id elementName + "Toggle",
+// it will be treated as a contract/expand image
+// if tableRow is specified, it's border will be set to 'none' while element is shown
+function toggleElement(elementName, tableRow) {
+    var element = dojo.byId(elementName);
+    var toggleImg = dojo.byId(elementName + "Toggle");
+
+    if (dojo.hasClass(element, "hidden")) {
+        dojo.removeClass(element, "hidden");
+        toggleImg.src = "/static/admin/images/contract.gif"
+        toggleImg.alt = "show";
+        if (tableRow) {
+            dojo.addClass(tableRow, "noborder");
+        }
+    } else {
+        dojo.addClass(element, "hidden");
+        toggleImg.src = "/static/admin/images/expand.gif"
+        toggleImg.alt = "hide";
+        if (tableRow) {
+            dojo.removeClass(tableRow, "noborder");
+        }
+    }
+}

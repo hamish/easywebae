@@ -1,7 +1,7 @@
 body {
 	margin: 0;
 	padding: 0;
-	font-family: verdana, arial, helvetica, sans-serif;
+	font-family: "Lucida Grande", Verdana, Lucida, Helvetica, Arial, sans-serif;
 	font-size: 76%;
 	background: #fff;
 }
@@ -68,10 +68,15 @@ div.topbit h1 {
 	font-size: 2em;
 }
 h2 {
+    margin-bottom: 0.5em;
     color: #2e5c8a;
-    font-size: 1.4em;
+    font-size: 1.2em;
     font-style: italic;
     font-weight: normal;
+}
+h3 {
+    font-size: 1.1em;
+    margin-bottom: 0.5em;
 }
 
 /**** content styles ****/
@@ -190,21 +195,35 @@ table tr.new td.active {
 table tr.new a, table tr.new button {
 	color: #206020;
 }
-table tr.instruction td {
+table tr.highlight th,
+    table tr.highlight td,
+table th.highlight {
+    background: #C0D4E8;
+}
+
+/* instructions */
+tr.instruction h3,
+tr.instruction ol {
+    margin: 0 0 5px 0;
+}
+table tr.instruction th,
+    table tr.instruction td {
+    line-height: 1.2em;
+    vertical-align: top;
+}
+    table tr.instruction td {
+    color: #456;
     font-size: 0.9em;
-    line-height: 1.3em;
 }
 table tr.instruction td img {
     margin-right: 0.5em;
     border: 0;
 }
+
+/* note */
 form table tr td.note {
     color: #fff;
     background: transparent;
-}
-table tr.highlight th,
-    table tr.highlight td {
-    background: #C0D4E8;
 }
 form table tr td.note {
     border-left: 3px solid #fff;
@@ -213,6 +232,8 @@ form table tr td.note {
     color: #666;
 	background: #ECF2F8;
 }
+
+/* problem */
 .problem th, .problem td {
 	color: #993333;
 	background: #F8ECEC;
@@ -264,18 +285,24 @@ table tr.noborder th,
     table tr.noborder td {
     border-width: 0;
 }
+
+/* toggle */
+table tr.toggle th,
+table tr.toggle td,
+table th.toggle {
+    cursor: pointer;
+}
 table tr.toggle td {
     font-size: 0.9em;
 }
 table tr.toggle span {
 	color: #3D7AB8;
-    vertical-align: middle;
-    cursor: pointer;
 }
 table tr.toggle img {
-    vertical-align: middle;
     border: none;
 }
+
+/* advanced */
 table tr.advanced th,
     table tr.advanced td {
     color: #333399;
@@ -296,6 +323,8 @@ table tr.advanced.highlight th,
 table tr.advanced.highlight td.note {
 	background: #ECECF8;
 }
+
+/* spacer */
 table tr.spacer th {
 	line-height: 1em;
 }

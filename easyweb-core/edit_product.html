@@ -44,6 +44,8 @@
                 <input type="hidden" id="product_file_name"  name="product_file_name" value="" />
                 <input type="hidden" id="product_file_ext"  name="product_file_ext" value="" />
 
+                <h2>Book details</h2>
+
                 <table cellspacing="0" cellpadding="0" class="hasHTMLeditor">
                     <tr class="highlightable">
                         <th><span class="required">*</span>Name:</th>
@@ -71,7 +73,7 @@
                         <td name="comment" class="note hidden">Upload {% if product.key %}a new version of{% endif %} your ebook</td>
                     </tr>
                     <tr class="highlightable">
-                        <th><span class="required">*</span>Successful Purchase:</th>
+                        <th><span class="required">*</span>Successful Purchase page:</th>
                         <td><select id="product_return_url" name="product_return_url" class="dropdown validate">
                                 <option value="">please select</option>
                             {% for page in pages %}
@@ -91,7 +93,7 @@
                     </tr>
                     
                     <tr class="highlightable advanced hidden">
-                        <th>Second Chance:</th>
+                        <th>Second Chance page:</th>
                         <td><select id="product_return_cancel_url" name="product_return_cancel_url" class="dropdown">
                                 <option value="">please select</option>
                             {% for page in pages %}
@@ -103,9 +105,30 @@
                     </tr>
                 </table>
 
-                <h2>Email for successful customers</h2>
+                <h2>"Successful Purchase" email</h2>
 
                 <table cellspacing="0" cellpadding="0" class="hasHTMLeditor">
+                    <tr class="toggle instruction noborder">
+                        <th colspan="2" onclick="toggleElement('instruction', this.parentNode)"
+							onmouseover="dojo.addClass(this, 'highlight')"
+							onmouseout="dojo.removeClass(this, 'highlight')"><img id="instructionToggle" src="/static/admin/images/contract.gif" alt="hide" /> Instructions</th>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                    </tr>
+                    <tr id="instruction" class="instruction">
+                        <td colspan="2">This email will be sent to a customer once they've paid for your book.
+                               <strong>Be sure to include a download link</strong>, as this is the only way they can get their copy of your book.
+                            <blockquote>
+                                <h3>To insert a download link:</h3>
+                                <ol>
+                                    <li>Click the templates icon</li>
+                                    <li>Choose "Insert link here"</li>
+                                </ol>
+                            </blockquote>
+                            When the email is sent, the words "Insert Book Link Here"
+                                will be replaced with a secure, automatically-generated link.
+                        </td>
+                        <td name="comment" class="placeholder">&nbsp;</td>
+                    </tr>
                     <tr class="highlightable">
                         <th>Subject:</th>
                         <td><input type="text" name="sucess_email_subject"
