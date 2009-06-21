@@ -1,0 +1,24 @@
+<html>
+	<head>
+		<title>easywebAE admin</title>
+
+		{% include "head.html" %}
+
+	</head>
+	<body>	
+
+		{% include "menu.html" %}
+		
+		<h1>Easyweb admin</h1>
+		
+		<h2>Fake Purchase created:</h2>
+		
+		The following email would have been sent to the user specified:
+		<hr />
+		{{body}}
+		<hr />
+		<p><a href="/admin/admin.html" id="logout">Create new Fake Payment</a></p>
+		
+		<p><a href="{{logout_url}}" id="logout">Logout</a></p>
+	</body>
+</html>

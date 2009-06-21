@@ -1,3 +1,7 @@
+{% if is_admin %}
+	<hr />
+	<a href="/admin/edit/?url={{url}}" id="edit">Edit</a> this page.
+{% endif %}	
 	{% if preferences.anylitics_id  and not is_admin %}
 		<script type="text/javascript">
 			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

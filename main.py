@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 #
-# First steps for easyweb, a content management system running on 
-# appEngine.
 
 import cgi
 import os
@@ -20,6 +18,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import mail
 
 from easywebmodels import *
+
 
 from BeautifulSoup import BeautifulSoup, Tag, NavigableString
 #### Base Class #######
@@ -420,10 +419,91 @@ class AdminRedirector(EasywebRequestHandler):
     def get(self):
         self.redirect('/admin/pages.html')
 
-        
+############################################        
 class PaypalIPNHandler(EasywebRequestHandler):
     live_url = "https://www.paypal.com/cgi-bin/webscr"
     test_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr'
+
+    def post(self):
+        self.get()
+    def get(self):
+        self.process_ipn(1)
+        self.response.out.write('ipn processing complete')
+
+    def process_ipn(self, do_paypal_verification):
+        preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+        preferences = preference_list.get()
+
+        data = {}
+        for i in self.request.arguments():
+            data[i] = self.request.get(i)
+
+        product_key = self.request.get('custom')
+        logging.info("key = " + product_key)
+        product = db.get(db.Key(product_key))
+
+        ipn_verified = True
+        if do_paypal_verification:
+            ipn_verified = self.is_ipn_valid(data)
+        else:
+            ipn_verified = (self.request.get('paypal_verification') == 'Success')
+        price_verified = self.is_price_valid(data, product)
+
+        verified = (ipn_verified and price_verified)
+            
+        payment = Payment()
+        payment.first_name = self.request.get('first_name')
+        payment.last_name = self.request.get('last_name')
+        payment.payer_email = self.request.get('payer_email')
+        payment.txn_id = self.request.get('txn_id')
+        payment.item_name = self.request.get('item_name')
+        payment.product_key = product_key
+        payment.mc_gross = self.request.get('mc_gross')
+        
+        payment.verification_url = self.get_verification_url(data)
+        if verified:
+            payment.verification_result = "Success"
+        else:
+            payment.verification_result = "Failure"
+        payment.all_values = dict_to_string(data)
+        payment.put()
+           
+        template_values = {
+            'payment'     : payment,
+            'product'     : product,
+            'ipn_verified': ipn_verified,
+            'price_verified': price_verified,
+            'variables'   : dict_to_string(data),
+            'domain'      : self.get_domain(),
+        }
+
+        subject=''
+        body=''
+        sender = preferences.admin_email
+        to = preferences.admin_email
+        #link_token = '<img alt="Insert_Link_Here" src="/static/admin/images/insert_link_here.png" />'
+        link= "%s/download/%s/%s" %( self.get_domain(), payment.key(), product.file_name)
+        if verified:
+            # send email to user
+            subject = product.sucess_email_subject
+            body_soup = BeautifulSoup(product.sucess_email_body)
+            link_markers = body_soup.findAll('img', {'alt' : 'Insert_Link_Here'})
+            for marker in link_markers:
+                marker.replaceWith(link)
+            body = "%s" % body_soup
+            to = payment.payer_email
+        else:
+            # send email to admin
+            subject = "Verification Failure"
+            path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'purchase_validation_error_email.html')
+            body = template.render(path, template_values)
+        if do_paypal_verification:            
+            message = mail.EmailMessage(sender=sender, subject=subject, to=to, body=body )
+            message.send()
+        else:
+            logging.warning("Paypal Verification dissabled: Email Message not sent. body:")
+            logging.warning(body)
+        return body
 
     def get_verification_url(self, data):
         verification_url = self.live_url
@@ -449,82 +529,6 @@ class PaypalIPNHandler(EasywebRequestHandler):
         ipn_verified =  (result == 'VERIFIED')
         return ipn_verified
     
-    def post(self):
-        self.get()
-    def get(self):
-        self.process_ipn(1)
-    def process_ipn(self, do_paypal_verification):
-        preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
-        preferences = preference_list.get()
-
-        data = {}
-        for i in self.request.arguments():
-            data[i] = self.request.get(i)
-
-        product_key = self.request.get('custom')
-        logging.info("key = " + product_key)
-        product = db.get(db.Key(product_key))
-
-        ipn_verified = (1==1)
-        if do_paypal_verification:
-            ipn_verified = self.is_ipn_valid(data)
-        else:
-            ipn_verified = (self.request.get('paypal_verification') == 'Success')
-        price_verified = self.is_price_valid(data, product)
-
-        verified = (ipn_verified and price_verified)
-            
-        payment = Payment()
-        payment.first_name = self.request.get('first_name')
-        payment.last_name = self.request.get('last_name')
-        payment.payer_email = self.request.get('payer_email')
-        payment.txn_id = self.request.get('txn_id')
-        payment.item_name = self.request.get('item_name')
-        payment.product_key = product_key
-        payment.mc_gross = self.request.get('mc_gross')
-        
-        payment.verification_url = self.get_verification_url(data)
-        if verified:
-            payment.verification_result = "Success"
-        else:
-            payment.verification_result = "Failure"
-        payment.all_values = dict_to_string(data)
-        payment.put()
-
-        url = self.request.url
-        pos = url.find('/', 9) # find the first / after the http:// part
-        domain= url[:pos]
-            
-        template_values = {
-            'payment'     : payment,
-            'product'     : product,
-            'ipn_verified': ipn_verified,
-            'price_verified': price_verified,
-            'variables'   : dict_to_string(data),
-            'domain'      : domain,
-        }
-
-        subject=''
-        body=''
-        sender = preferences.admin_email
-        to = preferences.admin_email
-        link_token = '<img src="/static/admin/images/insert_link_here.png" alt="" />'
-        link= "%s/download/%s/%s" %( domain, payment.key(), product.file_name)
-        if verified:
-            # send email to user
-            subject = product.sucess_email_subject
-            tmp_body=product.sucess_email_body            
-            body = tmp_body.replace(link_token, link)
-            to = payment.payer_email
-        else:
-            # send email to admin
-            subject = "Verification Failure"
-            path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'purchase_validation_error_email.html')
-            body = template.render(path, template_values)
-        message = mail.EmailMessage(sender=sender, subject=subject, to=to, body=body, )
-        message.send()            
-        
-        self.response.out.write('processing complete')
 
     def do_post(self, url, args):
         return urlfetch.fetch(
@@ -546,10 +550,17 @@ class PaypalIPNHandler(EasywebRequestHandler):
         r.update(data)
         return  result == 'VERIFIED'
 
+
+############################################
 class FakePaymentHandler(PaypalIPNHandler):
     def post(self):
-        self.process_ipn(0)
-        self.redirect('/admin/purchases.html')
+        body = self.process_ipn(0)
+        template_values = {
+            'body'      : body,
+        }        
+        path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'fake_payment.html')
+        self.response.out.write(template.render(path, template_values))
+        #self.redirect('/admin/purchases.html')
     
 def dict_to_string(dict):
     s=""

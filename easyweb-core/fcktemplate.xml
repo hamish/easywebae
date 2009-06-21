@@ -58,7 +58,7 @@
     <Description>Insert Link there</Description>
     <Html>
       <![CDATA[
-        <img src="/static/admin/images/insert_link_here.png" />
+        <img src="/static/admin/images/insert_link_here.png" alt="Insert_Link_Here" />        
       ]]>
     </Html>
   </Template>

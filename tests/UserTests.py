@@ -1,15 +1,14 @@
 from selenium import selenium
-import unittest, time, re
+import unittest, time, re, sys
 
 class EasywebTests(unittest.TestCase):
     """
       TODO: 
         Test for sitemap
-        
     """
         
     def setUp(self):
-        self.selenium = selenium("localhost", 4444, "*custom firefox -p selenium -no-remote", "http://localhost:8080/")
+        self.selenium = selenium("localhost", 4444, "*chrome", "http://localhost:8080/")
         self.selenium.start()
 
     def tearDown(self):
@@ -114,19 +113,60 @@ class EasywebTests(unittest.TestCase):
         self.failUnless(sel.is_text_present(new_body))
         self.failIf(sel.is_text_present(body))
 
+    def test_Payment(self):
+        sel=self.selenium
+        current_time = self.get_time()
+        file_path = "%s/tests/Sample_ebook.pdf" %sys.path[0]
+        self.login(sel)
+        
+        self.set_anylitics_id(sel, "Fake")
+
+        #Create a new product
+        self.click_and_wait(sel, "link=Ebook")
+        self.click_and_wait(sel, "//td[@onclick='document.location=\"/admin/newProduct/\"']")
+        
+        sel.type("product_name", "test_book_%s" %current_time)
+        sel.type("product_price", "1.00")
+        # todo - change this to be part of the checkout
+        sel.type("product_file_upload", file_path)
+        sel.select("product_return_url", "label=/thanks/")
+        self.click_and_wait(sel, "//option[@value='/thanks/']")
+        sel.type("sucess_email_subject", "email subject [%s]" % current_time)
+        emailBody = 'Thanks for the purchase. URL:<img src="/static/admin/images/insert_link_here.png" alt="Insert_Link_Here" /> Test User '
+        self.setRichTextContent(sel, emailBody, "rich_text")
+
+        self.click_and_wait(sel, "//td[@name='submit']")
+
+        self.open_and_wait(sel, "/admin/admin.html")
+        
+        sel.type("first_name", "First")
+        sel.type("last_name", "Last")
+        sel.type("payer_email", "blah@blah.com")
+        sel.type("mc_gross", "1.00")
+        sel.select("paypal_verification", "label=Success")        
+        sel.select("custom", "label=test_book_%s ($1.00)" %current_time)
+   
+        self.click_and_wait(sel, "//input[@type='submit']")
+
+        self.assert_src_does_not_contain_element(sel, "There was an error with the purchase")
+        self.failIf(sel.is_element_present("//img[@alt='Insert_Link_Here']"))
+        self.assert_src_contains_element(sel, "The following email would have been sent to the user specified")
+        self.assert_src_contains_element(sel, "Thanks for the purchase.")
+
 ################# Utility Methods
     def set_page_values_and_submit(self, sel, url, title, body, sitemap):
         # Give the rich text editor some time to load 
         # This appears to only be needed some of the time. Hamish
-        time.sleep(2)
+        time.sleep(2)                
         self.validate_and_type(sel, "//form[@name='page_content']//input[@name='url']", url)
         self.validate_and_type(sel, "//form[@name='page_content']//input[@name='title']", title)
         if (sitemap):
-            sel.select("include_in_sitemap", "label=Yes")
+            sel.check("include_in_sitemap")
         else:
-            sel.select("include_in_sitemap", "label=No")
+            sel.uncheck("include_in_sitemap")
         self.setRichTextContent(sel, body)
-        self.click_and_wait(sel, "//form[@name='page_content']//td[@id='save']")
+        #self.click_and_wait(sel, "//form[@name='page_content']//td[@id='save']")
+        self.click_and_wait(sel, "save")
 
     def assert_error_page(self, sel, url):
         self.open_and_wait(sel, url)
@@ -141,6 +181,11 @@ class EasywebTests(unittest.TestCase):
         self.open_and_wait(sel, "/admin/pages.html")
         self.click_and_wait(sel, "//td[@id='new_page_link']")
         #self.click_and_wait(sel, "link=add a new page")
+
+        # select inplace editing
+        sel.select("editor", "label=Edit online")
+        sel.click("//option[@value='inplace']")
+        
         self.set_page_values_and_submit(sel, url, title, body, sitemap)
 
     def login(self, sel):
@@ -164,9 +209,9 @@ class EasywebTests(unittest.TestCase):
         sel.open(url)
         sel.wait_for_page_to_load("30000")
     
-    def setRichTextContent(self, sel, body):
+    def setRichTextContent(self, sel, body, fieldName='rich_text'):
         html_data = "<body>" + body + "</body>"
-        script = "var oEditor = FCKeditorAPI.GetInstance('html'); oEditor.SetHTML(" + html_data + ");"
+        script = "var oEditor = FCKeditorAPI.GetInstance('"+fieldName+"'); oEditor.SetHTML(" + html_data + ");"
         sel.run_script(script)
         
     def get_time(self):
