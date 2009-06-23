@@ -120,7 +120,7 @@
 
                     <tr class="highlightable">
                         <th class="nowrap">Promote:</th>
-                        <td><input id="include_in_sitemap" type="checkbox" onchange="setSitemapComment()" value="true"{% if page.include_in_sitemap or not page.key %} checked="checked"{% endif %}>
+                        <td><input id="include_in_sitemap" name="include_in_sitemap" type="checkbox" onchange="setSitemapComment()" value="true"{% if page.include_in_sitemap or not page.key %} checked="checked"{% endif %}>
                             <label for="include_in_sitemap">Promote this page to Google</label> (via <a href='/Sitemap.xml'>your sitemap</a>)</td>
                         <td name="comment" class="placeholder">&nbsp;</td>
                         <td name="comment" class="note hidden"></td>
