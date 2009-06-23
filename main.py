@@ -294,6 +294,8 @@ class SaveHandler(EasywebRequestHandler):
         type = self.request.get('type', 'Sales')
         editor=self.request.get('editor', 'upload')
         promote = (self.request.get('include_in_sitemap', 'false') == 'true')
+        logging.info("include_in_Sitemap: %s" %self.request.get('include_in_sitemap'))
+        logging.info("include_in_Sitemap: %s" %self.request.get('include_in_sitemap', 'false'))
         if editor=="upload":
             content=self.request.get("content")
             self.process_mht_file(content, url, promote, type)

@@ -12,6 +12,7 @@ class EasywebTests(unittest.TestCase):
         self.selenium.start()
 
     def tearDown(self):
+        time.sleep(2)
         self.selenium.stop()
 
     def test_sitemap(self):
@@ -165,6 +166,7 @@ class EasywebTests(unittest.TestCase):
         else:
             sel.uncheck("include_in_sitemap")
         self.setRichTextContent(sel, body)
+        sel.focus("//form[@name='page_content']//input[@name='url']")
         #self.click_and_wait(sel, "//form[@name='page_content']//td[@id='save']")
         self.click_and_wait(sel, "save")
 
