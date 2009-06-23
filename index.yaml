@@ -10,13 +10,13 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Used 2 times in query history.
+# Used 3 times in query history.
 - kind: Page
   properties:
   - name: include_in_sitemap
   - name: url
 
-# Used 146 times in query history.
+# Used 220 times in query history.
 - kind: Page
   properties:
   - name: type
