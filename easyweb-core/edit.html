@@ -143,14 +143,14 @@
                         <th><span class="required">*</span>File:</th>
                         <td><input type="file" id="content"
                                    name="content"
-                                   class="file validate" onchange="SplitFile();"/></td>
+                                   class="file{% ifnotequal page.editor 'inplace' %} validate{% endifnotequal %}" onchange="SplitFile();"/></td>
                         <td name="comment" class="placeholder">&nbsp;</td>
                         <td name="comment" class="note hidden">Upload your Single File Webpage (.mht)</td>
                         <td name="comment" class="error hidden">Please choose a Single File Webpage (.mht) to upload</td>
                     </tr>
                     <tr id="pagetitle" class="highlightable{% ifnotequal page.editor 'inplace' %} hidden{% endifnotequal %}">
                         <th><span class="required">*</span>Title:</th>
-                        <td><input type="text" id="title" name="title" class="title validate" value="{{page.title}}" /></td>
+                        <td><input type="text" id="title" name="title" class="title{% ifequal page.editor 'inplace' %} validate{% endifequal %}" value="{{page.title}}" /></td>
                         <td name="comment" class="placeholder">&nbsp;</td>
                         <td name="comment" class="note hidden">This will be displayed at the top of the browser window</td>
                         <td name="comment" class="error hidden">Please enter a title</td>

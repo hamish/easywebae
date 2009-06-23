@@ -16,7 +16,7 @@ indexes:
   - name: include_in_sitemap
   - name: url
 
-# Used 159 times in query history.
+# Used 146 times in query history.
 - kind: Page
   properties:
   - name: type
