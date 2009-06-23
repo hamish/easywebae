@@ -137,6 +137,8 @@
                         <td name="comment" class="placeholder">&nbsp;</td>
                         <td name="comment" class="note hidden"></td>
                     </tr>
+                {% else %}
+                    <input type="hidden" name="editor"  value="{{page.editor}}" />
                 {% endif %}
 
                     <tr id="fileupload" class="highlightable{% ifequal page.editor 'inplace' %} hidden{% endifequal %}">
