@@ -271,11 +271,12 @@ class SaveHandler(EasywebRequestHandler):
                     content = regex.sub( file_path , content)
                     html_soup =  BeautifulSoup(content)
                     logging.info("soup: %s" % html_soup.html.head.title)
-                    title_match=str(html_soup.head.title.string)
+                    title_match=html_soup.head.title
                     if title_match:
-                        title=title_match
+                        title=str(title_match.string)
                     promote_file=promote
-                    file_name = file_path
+                    if file_name.find("_files")==-1:
+                        file_name = file_path
                     file_type=type
                 page = self.get_page_for_write(file_name)
                 page.url = file_name

@@ -8,7 +8,9 @@ class EasywebTests(unittest.TestCase):
     """
         
     def setUp(self):
-        self.selenium = selenium("localhost", 4444, "*chrome", "http://localhost:8080/")
+        # self.selenium = selenium("localhost", 4444, "*chrome", "http://localhost:8080/")
+        self.selenium = selenium("localhost", 4444, "*chrome", "http://10.1.1.5:8080/")
+        # self.selenium = selenium("localhost", 4444, "*firefox", "http://localhost:8080/")
         self.selenium.start()
 
     def tearDown(self):
@@ -49,7 +51,7 @@ class EasywebTests(unittest.TestCase):
         self.create_new_page(sel, url, title, body)
         
         self.open_and_wait(sel, url)
-        self.failUnless(sel.is_text_present(body))
+        self.failUnless(sel.is_text_present(body), msg="url:%s body text not found"%url)
 
         marker = '_gat._getTracker("'
         self.assert_src_does_not_contain_element(sel, marker)        
