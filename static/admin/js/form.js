@@ -36,7 +36,7 @@ dojo.addOnLoad(function () {
             });
             if (dojo.hasClass(fields[j], "validate")) {
                 var eventType = "onkeyup";
-                if (fields[j].tagName == "SELECT") {
+                if (fields[j].tagName == "SELECT" || dojo.attr(fields[j], "type") == "file") {
                     eventType = "onchange"
                 }
                 dojo.connect(fields[j], eventType, function () {
