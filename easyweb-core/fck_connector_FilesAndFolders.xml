@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+  <Connector command="GetFoldersAndFiles" resourceType="File">
+    <CurrentFolder path="/" url="" />
+    <Folders>
+    </Folders>
+    <Files>
+{% for page in file_pages %}
+      <File name="{{page.url}}" size="4" />
+{% endfor %}
+    </Files>
+</Connector>

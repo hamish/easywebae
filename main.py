@@ -186,6 +186,17 @@ class MainHandler(EasywebRequestHandler):
             logging.info("raw")
             self.response.out.write(html)
 
+class FckConnectorHandler(EasywebRequestHandler):
+  def get(self):
+
+    requestedType = self.request.get('Type', 'File')
+    type='Sales'
+    if (requestedType == 'Image'):
+        type='File'
+    file_pages=db.GqlQuery("SELECT * FROM Page WHERE type='%s' ORDER BY url "% type)
+    values={'file_pages': file_pages}
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'fck_connector_FilesAndFolders.xml')
+    self.response.out.write(template.render(path, values))  
 class AdminHandler(EasywebRequestHandler):
   def setup_thanks_page(self):
       thanks_pages=db.GqlQuery("SELECT * FROM Page WHERE type='Thanks' ORDER BY url ")
@@ -210,11 +221,13 @@ class AdminHandler(EasywebRequestHandler):
             template_name=my_file
     sales_pages=db.GqlQuery("SELECT * FROM Page WHERE type='Sales' ORDER BY url ")
     thanks_pages=db.GqlQuery("SELECT * FROM Page WHERE type='Thanks' ORDER BY url ")
+    file_pages=db.GqlQuery("SELECT * FROM Page WHERE type='File' ORDER BY url ")
     products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
     payments=db.GqlQuery("SELECT * FROM Payment ORDER BY creation_date")
     values = {
               'sales_pages' : sales_pages,
               'thanks_pages' : thanks_pages,
+              'file_pages' : file_pages,
               'products' : products,
               'payments' : payments,
               'preferences' : self.get_preferences(),
@@ -249,7 +262,7 @@ class SitemapHandler(EasywebRequestHandler):
     self.response.out.write(template.render(path, values))
 
 class SaveHandler(EasywebRequestHandler):
-    def process_mht_file(self, content, file_url, promote, type):
+    def process_mht_file(self, content, file_url, promote, type, pageWidth=0):
         logging.info("process mht_file")
         msg = email.message_from_string(content)
         file_path = file_url
@@ -267,16 +280,20 @@ class SaveHandler(EasywebRequestHandler):
                 promote_file=False
                 file_type="File"
                 style_key=""
-                if (ct.startswith("text/html")):
+                #if (ct.startswith("text/html")):
+                if file_name.find("_files")==-1:
                     content = regex.sub( file_path , content)
+                    if pageWidth:
+                        body_style="<style>body {width:%ipx;margin-left:auto;margin-right:auto;}</style>"%pageWidth
+                        end_body_loc = content.rfind('</head')
+                        content="%s%s%s" % (content[:end_body_loc], body_style, content[end_body_loc:])            
                     html_soup =  BeautifulSoup(content)
                     logging.info("soup: %s" % html_soup.html.head.title)
                     title_match=html_soup.head.title
                     if title_match:
                         title=str(title_match.string)
                     promote_file=promote
-                    if file_name.find("_files")==-1:
-                        file_name = file_path
+                    file_name = file_path
                     file_type=type
                 page = self.get_page_for_write(file_name)
                 page.url = file_name
@@ -589,6 +606,7 @@ def main():
                                         ('/admin/upload/', UploadHandler),
                                         ('/product/.*', UserProductHandler),
                                         ('/style/.*', StyleHandler),
+                                        ('/connector.py', FckConnectorHandler),
                                         ('.*', MainHandler),
                                         ])
   wsgiref.handlers.CGIHandler().run(application)

@@ -87,6 +87,31 @@
 				</tr>
 			</table>
 
+			<h1>Files</h1>
+			
+			<table cellpadding="0" cellspacing="0"> 
+				{% for page in file_pages %}
+				{% if forloop.first %}
+				<tr>
+					<th>Location</th>
+					<th>&nbsp;</th>
+				</tr>
+				{% endif %}
+				<tr>
+					<td class="url">{{page.url}}</td>
+					<td class="action go" onclick='document.location="{{page.url}}"' id="go_{{page.url}}"
+						onmouseover="dojo.addClass(this, 'active')"
+						onmouseout="dojo.removeClass(this, 'active')">go</td>
+				</tr>
+				{% endfor %}
+				
+				<tr class="new">
+					<td id="new_page_link" colspan="5" class="action" onclick='document.location="/admin/new/"'
+						onmouseover="dojo.addClass(this, 'active')"
+						onmouseout="dojo.removeClass(this, 'active')">add a new page</td>
+				</tr>
+			</table>
+
 		</div>
 	</body>
 </html>

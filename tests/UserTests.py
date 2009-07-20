@@ -8,8 +8,10 @@ class EasywebTests(unittest.TestCase):
     """
         
     def setUp(self):
-        # self.selenium = selenium("localhost", 4444, "*chrome", "http://localhost:8080/")
-        self.selenium = selenium("localhost", 4444, "*chrome", "http://10.1.1.5:8080/")
+        # http://saucelabs.com/docs/browsers
+        
+        self.selenium = selenium("localhost", 4444, "*chrome", "http://localhost:8080/")
+        #self.selenium = selenium("localhost", 4444, "*chrome", "http://10.1.1.5:8080/")
         # self.selenium = selenium("localhost", 4444, "*firefox", "http://localhost:8080/")
         self.selenium.start()
 
