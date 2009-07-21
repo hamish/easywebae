@@ -1,0 +1,7 @@
+body {
+    width: 980px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 10px solid #000080;
+    border-width: 0 10px;
+}

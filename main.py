@@ -41,6 +41,7 @@ class EasywebRequestHandler(webapp.RequestHandler):
             page=Page(type=type)
             page.url=url
         return page
+        
 #### END Base Class #######
             
 class UserProductHandler(EasywebRequestHandler):
@@ -324,11 +325,18 @@ class SaveHandler(EasywebRequestHandler):
             page.url = url
             page.title = self.request.get('title')
             page.editor = self.request.get('editor')
-            page.html = str(self.request.get('html'))
+            page.html = self.getBody(str(self.request.get('html')), page.title)
             page.include_in_sitemap = promote
             page.put()
         self.redirect('/admin/pages.html')
-
+    def getBody(self, html_body, html_title):
+        values = {
+                  'html_title': html_title,
+                  'html_body': html_body,
+                  'domain': self.get_domain(),
+                  }
+        path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'standard_content.html')
+        return template.render(path, values)
 class UploadHandler(EasywebRequestHandler):
 
     def post(self):
