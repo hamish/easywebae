@@ -316,6 +316,18 @@ class SaveHandler(EasywebRequestHandler):
         if editor=="upload":
             content=self.request.get("content")
             self.process_mht_file(content, url, promote, type)
+        elif editor=="file":
+            content=self.request.get("content")
+            page = self.get_page_for_write(url, type='File')
+            page.url = url
+            page.html = content
+            page.title = "Uploaded file"
+            page.editor = 'Upload'
+            page.include_in_sitemap = promote
+            page.type='File'
+            page.put()
+            logging.info("url: %s type: %s" %(page.url, page.type))
+
         else:
             page=self.get_page_for_write(url, type=type)
             if (key_name):
@@ -400,7 +412,24 @@ class ProductHandler(EasywebRequestHandler):
             logging.info("file not set - ignoring")
         product.put()        
         self.redirect('/admin/book.html')
-        
+class EditFileHandler(EasywebRequestHandler):
+  def get(self):
+    key_name = self.request.get('key')
+    product={}
+    if (key_name):
+        product= db.get(db.Key(key_name))
+    preference_list=db.GqlQuery("SELECT * FROM Preferences LIMIT 1")
+    pages=db.GqlQuery("SELECT * FROM Page ORDER BY url")
+    products=db.GqlQuery("SELECT * FROM Product ORDER BY name")
+    payments=db.GqlQuery("SELECT * FROM Payment ORDER BY creation_date")
+    values = {
+              'pages' : pages,
+              'preferences' : preference_list.get(),
+              'logout_url': users.create_logout_url("/"),
+              'product' : product,
+              }
+    path = os.path.join(os.path.dirname(__file__),'easyweb-core', 'edit_file.html')
+    self.response.out.write(template.render(path, values))
 class EditProductHandler(EasywebRequestHandler):
   def get(self):
     key_name = self.request.get('key')
@@ -602,6 +631,7 @@ def main():
                                         ('/admin/savePreferences/', PreferencesHandler),
                                         ('/admin/saveProduct/', ProductHandler),
                                         ('/admin/newProduct/', EditProductHandler),
+                                        ('/admin/newFile/', EditFileHandler),
                                         ('/admin/editProduct/', EditProductHandler),
                                         ('/admin/savePayment/', FakePaymentHandler),
                                         ('/admin/new/', EditHandler),
